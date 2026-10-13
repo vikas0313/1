@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍜</text></svg>" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta id="theme-color-meta" name="theme-color" content="#141414" />
+    <title>Ritsu Food Corner | Indo-Chinese QR Dining</title>
+    <meta name="description" content="Indo-Chinese ka asli maza – Ritsu ke saath! Order directly from your table via QR code." />
+
+    <!-- Pre-render theme resolver script to prevent Flash of Unstyled Theme (FOUT) -->
+    <script>
+      (function() {
+        try {
+          var isOwnerRoute = window.location.pathname.startsWith('/owner');
+          var storageKey = isOwnerRoute ? 'ritsu-owner-theme' : 'ritsu-theme';
+          var stored = localStorage.getItem(storageKey);
+          var theme = 'dark'; // customer default
+
+          if (isOwnerRoute && !stored) {
+            theme = 'light'; // owner default is light
+          } else if (stored === 'light' || stored === 'dark') {
+            theme = stored;
+          } else if (stored === 'system' || !stored) {
+            var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            theme = prefersDark ? 'dark' : (isOwnerRoute ? 'light' : 'dark');
+          }
+
+          document.documentElement.setAttribute('data-theme', theme);
+          document.documentElement.style.colorScheme = theme;
+          var meta = document.getElementById('theme-color-meta');
+          if (meta) {
+            meta.setAttribute('content', theme === 'dark' ? '#141414' : '#FFF9EE');
+          }
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body class="antialiased selection:bg-red-600 selection:text-white">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
