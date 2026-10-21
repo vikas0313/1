@@ -40,7 +40,7 @@ export const AdminOrdersModal: React.FC<AdminOrdersModalProps> = ({ isOpen, onCl
   const { session, isOwner, signIn, signOut, isSupabaseBackend } = useAuth();
 
   // Auth states
-  const [username, setUsername] = useState<string>('admin');
+  const [username, setUsername] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [loginError, setLoginError] = useState<string | null>(null);
@@ -287,7 +287,7 @@ export const AdminOrdersModal: React.FC<AdminOrdersModalProps> = ({ isOpen, onCl
                       setUsername(e.target.value);
                       if (loginError) setLoginError(null);
                     }}
-                    placeholder="admin"
+                    placeholder="Enter username or email"
                     className="w-full px-4 py-2.5 rounded-xl bg-card border border-app text-app placeholder-app-muted focus:outline-none focus:border-primary text-sm min-h-[44px]"
                   />
                 </div>
