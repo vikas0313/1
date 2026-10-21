@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Lock, AlertCircle, ShieldCheck, KeyRound } from 'lucide-react';
+import { Lock, AlertCircle, ShieldCheck } from 'lucide-react';
 import { RESTAURANT_CONFIG } from '../../config/restaurant.config';
 
 interface LocalDemoLoginProps {
@@ -76,16 +76,6 @@ export const LocalDemoLogin: React.FC<LocalDemoLoginProps> = ({ onSuccess }) => 
           <h1 className="text-xl font-bold text-white mt-1">Staff & Owner Portal</h1>
           <p className="text-xs text-neutral-400 mt-1">
             Enter password to access kitchen management & live orders.
-          </p>
-        </div>
-
-        <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-3 mb-5 text-left text-xs text-amber-300">
-          <div className="font-semibold flex items-center gap-1 mb-1">
-            <KeyRound className="w-3.5 h-3.5" />
-            <span>Demo Password</span>
-          </div>
-          <p className="text-[11px] text-amber-300/80">
-            Prototype demo password: <code className="bg-neutral-950 px-1.5 py-0.5 rounded font-mono font-bold text-white">{demoPassword || 'configured in .env'}</code>
           </p>
         </div>
 

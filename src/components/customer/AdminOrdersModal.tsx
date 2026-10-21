@@ -274,26 +274,6 @@ export const AdminOrdersModal: React.FC<AdminOrdersModalProps> = ({ isOpen, onCl
                 </p>
               </div>
 
-              {/* Demo Credentials Helper */}
-              {Boolean(!isSupabaseBackend || getDemoPassword()) && (
-                <div className="bg-amber-500/10 border border-amber-500/20 rounded-2xl p-3.5 mb-5 text-xs text-amber-300">
-                  <div className="font-semibold flex items-center gap-1.5 mb-1 text-amber-400">
-                    <ShieldCheck className="w-4 h-4" />
-                    <span>Default Owner Credentials</span>
-                  </div>
-                  <div className="grid grid-cols-2 gap-2 mt-2 font-mono text-[11px]">
-                    <div className="bg-neutral-950/50 p-2 rounded-lg border border-amber-500/20">
-                      <span className="text-app-muted block text-[10px] uppercase font-sans">Username</span>
-                      <span className="font-bold text-white">admin</span>
-                    </div>
-                    <div className="bg-neutral-950/50 p-2 rounded-lg border border-amber-500/20">
-                      <span className="text-app-muted block text-[10px] uppercase font-sans">Password</span>
-                      <span className="font-bold text-white">{getDemoPassword()}</span>
-                    </div>
-                  </div>
-                </div>
-              )}
-
               <form onSubmit={handleLogin} className="space-y-4">
                 <div>
                   <label className="block text-xs font-semibold text-app mb-1.5">
