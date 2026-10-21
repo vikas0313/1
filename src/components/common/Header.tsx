@@ -1,6 +1,6 @@
 import React from 'react';
 import { RESTAURANT_CONFIG } from '../../config/restaurant.config';
-import { ShoppingBag, UtensilsCrossed, PhoneCall, User } from 'lucide-react';
+import { ShoppingBag, UtensilsCrossed, PhoneCall, User, ShieldCheck } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
 import { useTheme } from '../../hooks/useTheme';
 
@@ -9,6 +9,7 @@ interface HeaderProps {
   customerName?: string;
   cartItemCount: number;
   onOpenCart: () => void;
+  onOpenAdmin?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -16,6 +17,7 @@ export const Header: React.FC<HeaderProps> = ({
   customerName,
   cartItemCount,
   onOpenCart,
+  onOpenAdmin,
 }) => {
   const { theme, resolvedTheme, setTheme } = useTheme();
 
@@ -70,6 +72,18 @@ export const Header: React.FC<HeaderProps> = ({
             onThemeChange={setTheme}
             variant="compact"
           />
+
+          {onOpenAdmin && (
+            <button
+              onClick={onOpenAdmin}
+              className="px-2.5 py-2 rounded-xl bg-card hover:bg-surface border border-app text-app text-xs font-bold flex items-center gap-1.5 transition min-h-[44px] cursor-pointer active:scale-95 shadow-sm"
+              title="Admin / Owner Login"
+              aria-label="Admin Login"
+            >
+              <ShieldCheck className="w-4 h-4 text-amber-400" />
+              <span className="hidden xs:inline">Admin</span>
+            </button>
+          )}
 
           <button
             onClick={onOpenCart}

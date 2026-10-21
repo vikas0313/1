@@ -12,6 +12,7 @@ import { CartDrawer } from '../components/customer/CartDrawer';
 import { UpiPaymentModal } from '../components/customer/UpiPaymentModal';
 import { OrderTracker } from '../components/customer/OrderTracker';
 import { ReceiptView } from '../components/customer/ReceiptView';
+import { AdminOrdersModal } from '../components/customer/AdminOrdersModal';
 import { useMenu } from '../hooks/useMenu';
 import { useCart } from '../hooks/useCart';
 import { useOrders } from '../hooks/useOrders';
@@ -41,6 +42,7 @@ const CustomerPageContent: React.FC<{ tableLabel: string }> = ({ tableLabel }) =
   const [activeReceiptOrder, setActiveReceiptOrder] = useState<Order | null>(null);
   const [selectedTrackingOrderId, setSelectedTrackingOrderId] = useState<string | null>(null);
   const [isPlacingOrder, setIsPlacingOrder] = useState<boolean>(false);
+  const [isAdminModalOpen, setIsAdminModalOpen] = useState<boolean>(false);
 
   // Data hooks
   const { categories, items, loading: menuLoading } = useMenu();
@@ -162,6 +164,7 @@ const CustomerPageContent: React.FC<{ tableLabel: string }> = ({ tableLabel }) =
         customerName={customerName}
         cartItemCount={totalItemCount}
         onOpenCart={() => setIsCartOpen(true)}
+        onOpenAdmin={() => setIsAdminModalOpen(true)}
       />
 
       <main className="max-w-4xl mx-auto">
@@ -306,6 +309,11 @@ const CustomerPageContent: React.FC<{ tableLabel: string }> = ({ tableLabel }) =
           onClose={() => setActiveReceiptOrder(null)}
         />
       )}
+
+      <AdminOrdersModal
+        isOpen={isAdminModalOpen}
+        onClose={() => setIsAdminModalOpen(false)}
+      />
     </div>
   );
 };
