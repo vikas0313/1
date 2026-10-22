@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { useOrders } from '../../hooks/useOrders';
 import { useAudioAlert } from '../../hooks/useAudioAlert';
 import { OrderCard } from './OrderCard';
@@ -25,14 +25,11 @@ export const LiveOrdersBoard: React.FC = () => {
   const [tableFilter, setTableFilter] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
 
-  const {
-    allOrders,
-    loading,
-    advanceOrderStatus,
-    cancelOrder,
-    markPaid,
-  } = useOrders({
-    onNewOrder: (newOrder) => {
+  // Stable callback – must not change identity on every render, otherwise
+  // useOrders will tear down and rebuild its realtime subscription each render,
+  // which is the root cause of orders not syncing in the Owner portal.
+  const handleNewOrder = useCallback(
+    (newOrder: Order) => {
       playChime();
       setNewOrderIds((prev) => new Set(prev).add(newOrder.id));
       // Remove visual highlight after 8 seconds
@@ -44,6 +41,17 @@ export const LiveOrdersBoard: React.FC = () => {
         });
       }, 8000);
     },
+    [playChime]
+  );
+
+  const {
+    allOrders,
+    loading,
+    advanceOrderStatus,
+    cancelOrder,
+    markPaid,
+  } = useOrders({
+    onNewOrder: handleNewOrder,
   });
 
   const filteredOrders = useMemo(() => {
