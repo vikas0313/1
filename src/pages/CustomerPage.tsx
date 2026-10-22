@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import confetti from 'canvas-confetti';
 import { TableGuard } from '../components/customer/TableGuard';
 import { NamePromptModal } from '../components/customer/NamePromptModal';
@@ -19,7 +19,21 @@ import { useOrders } from '../hooks/useOrders';
 import { MenuItem } from '../types/menu';
 import { Order } from '../types/order';
 import { formatINR } from '../domain/pricing';
-import { ShoppingBag, ArrowRight } from 'lucide-react';
+import { ShoppingBag, ArrowRight, CheckCircle, Star } from 'lucide-react';
+
+/** Clear all customer session data for a given table and reload the page */
+function clearCustomerSession(tableLabel: string) {
+  try {
+    sessionStorage.removeItem(`ritsu_cust_name_${tableLabel}`);
+    sessionStorage.removeItem('ritsu_current_table');
+    // Also clear any stored order tokens so no stale orders appear
+    localStorage.removeItem('ritsu_customer_order_tokens');
+  } catch {
+    // ignore storage errors
+  }
+  // Reload the page to reset to a fresh state
+  window.location.reload();
+}
 
 export const CustomerPage: React.FC = () => {
   return (
@@ -44,6 +58,12 @@ const CustomerPageContent: React.FC<{ tableLabel: string }> = ({ tableLabel }) =
   const [isPlacingOrder, setIsPlacingOrder] = useState<boolean>(false);
   const [isAdminModalOpen, setIsAdminModalOpen] = useState<boolean>(false);
 
+  // Thank-you / auto-logout state
+  const [isPaidOut, setIsPaidOut] = useState<boolean>(false);
+  // Track orders that were already in a non-paid state so we don't trigger on
+  // stale paid orders that existed before this session started.
+  const sessionOrderIdsRef = useRef<Set<string>>(new Set());
+
   // Data hooks
   const { categories, items, loading: menuLoading } = useMenu();
   const {
@@ -58,6 +78,76 @@ const CustomerPageContent: React.FC<{ tableLabel: string }> = ({ tableLabel }) =
     clearCart,
   } = useCart();
   const { orders: tableOrders, createOrder } = useOrders({ tableLabel });
+
+  // Track which order IDs were placed in this session (we care about orders
+  // placed from this device / session)
+  useEffect(() => {
+    tableOrders.forEach((o) => {
+      if (o.payment_status !== 'paid') {
+        sessionOrderIdsRef.current.add(o.id);
+      }
+    });
+  }, [tableOrders]);
+
+  // Auto-logout: when every order tracked in this session becomes paid,
+  // show the thank-you screen and reset after a short delay.
+  useEffect(() => {
+    if (isPaidOut) return; // already triggered
+    const trackedIds = sessionOrderIdsRef.current;
+    if (trackedIds.size === 0) return; // nothing ordered yet in this session
+
+    const allPaid = [...trackedIds].every((id) => {
+      const order = tableOrders.find((o) => o.id === id);
+      return order && order.payment_status === 'paid';
+    });
+
+    if (allPaid) {
+      setIsPaidOut(true);
+      // Clear session and reload after 4 seconds so the customer can read the
+      // thank-you message before the page resets.
+      setTimeout(() => {
+        clearCustomerSession(tableLabel);
+      }, 4000);
+    }
+  }, [tableOrders, tableLabel, isPaidOut]);
+
+  // Thank-you / paid-out screen
+  if (isPaidOut) {
+    return (
+      <div className="min-h-screen bg-app text-app flex flex-col items-center justify-center p-6 text-center">
+        <div className="max-w-sm w-full bg-surface border border-app rounded-3xl p-8 shadow-2xl flex flex-col items-center gap-4">
+          <div className="w-20 h-20 rounded-full bg-emerald-500/10 border-2 border-emerald-500/40 flex items-center justify-center">
+            <CheckCircle className="w-10 h-10 text-emerald-400" />
+          </div>
+
+          <div className="space-y-1">
+            <h2 className="text-2xl font-black text-app">Thank You!</h2>
+            <p className="text-sm text-app-muted">
+              Your bill has been settled. Hope you enjoyed your meal!
+            </p>
+          </div>
+
+          <div className="flex gap-1 mt-1">
+            {[1, 2, 3, 4, 5].map((s) => (
+              <Star key={s} className="w-5 h-5 text-amber-400 fill-amber-400" />
+            ))}
+          </div>
+
+          <p className="text-xs text-app-muted mt-2">
+            Resetting table in a few seconds…
+          </p>
+
+          {/* Manual reset button in case automatic redirect is slow */}
+          <button
+            onClick={() => clearCustomerSession(tableLabel)}
+            className="mt-2 py-2.5 px-6 rounded-xl bg-primary hover:bg-primary-hover text-white font-bold text-sm transition cursor-pointer active:scale-95"
+          >
+            Reset Table Now
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   // Filtered menu items
   const filteredItems = useMemo(() => {
