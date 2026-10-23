@@ -12,9 +12,11 @@ const BROADCAST_CHANNEL_NAME = 'ritsu_orders_bus';
 export class LocalStorageAdapter implements MenuRepository, OrderRepository {
   private channel: BroadcastChannel | null = null;
   private listeners: Set<OrderSubscriptionListener> = new Set();
+  private eventSource: EventSource | null = null;
 
   constructor() {
     this.initStorage();
+
     if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
       this.channel = new BroadcastChannel(BROADCAST_CHANNEL_NAME);
       this.channel.onmessage = (event) => {
@@ -30,6 +32,37 @@ export class LocalStorageAdapter implements MenuRepository, OrderRepository {
           this.notifySubscribers();
         }
       });
+
+      // Connect to local dev server SSE stream for instant multi-device live sync
+      if ('EventSource' in window) {
+        try {
+          this.eventSource = new EventSource('/api/events');
+          this.eventSource.onmessage = (event) => {
+            try {
+              const serverOrders: Order[] = JSON.parse(event.data);
+              if (Array.isArray(serverOrders)) {
+                localStorage.setItem(STORAGE_KEY_ORDERS, JSON.stringify(serverOrders));
+                this.notifySubscribers(serverOrders);
+              }
+            } catch {}
+          };
+        } catch {
+          // Fallback to local BroadcastChannel
+        }
+      }
+
+      // Initial fetch from local server file store if available
+      if ('fetch' in window) {
+        fetch('/api/orders')
+          .then((res) => (res.ok ? res.json() : null))
+          .then((serverOrders) => {
+            if (Array.isArray(serverOrders) && serverOrders.length > 0) {
+              localStorage.setItem(STORAGE_KEY_ORDERS, JSON.stringify(serverOrders));
+              this.notifySubscribers(serverOrders);
+            }
+          })
+          .catch(() => {});
+      }
     }
   }
 
@@ -61,8 +94,8 @@ export class LocalStorageAdapter implements MenuRepository, OrderRepository {
     this.notifySubscribers();
   }
 
-  private notifySubscribers(): void {
-    const orders = this.readOrdersSync();
+  private notifySubscribers(providedOrders?: Order[]): void {
+    const orders = providedOrders || this.readOrdersSync();
     this.listeners.forEach((listener) => {
       try {
         listener(orders);
@@ -231,6 +264,16 @@ export class LocalStorageAdapter implements MenuRepository, OrderRepository {
 
     const updatedOrders = [newOrder, ...orders];
     this.saveOrdersSync(updatedOrders);
+
+    // Sync to local server file store so all other connected devices (phone / owner portal) update
+    if (typeof window !== 'undefined' && 'fetch' in window) {
+      fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newOrder),
+      }).catch(() => {});
+    }
+
     return newOrder;
   }
 
@@ -251,6 +294,16 @@ export class LocalStorageAdapter implements MenuRepository, OrderRepository {
 
     orders[index] = updatedOrder;
     this.saveOrdersSync(orders);
+
+    // Sync to local server
+    if (typeof window !== 'undefined' && 'fetch' in window) {
+      fetch(`/api/orders/${encodeURIComponent(orderId)}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: nextStatus }),
+      }).catch(() => {});
+    }
+
     return updatedOrder;
   }
 
@@ -273,11 +326,24 @@ export class LocalStorageAdapter implements MenuRepository, OrderRepository {
 
     orders[index] = updatedOrder;
     this.saveOrdersSync(orders);
+
+    // Sync to local server
+    if (typeof window !== 'undefined' && 'fetch' in window) {
+      fetch(`/api/orders/${encodeURIComponent(orderId)}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ payment_status: paymentStatus, payment_method: method }),
+      }).catch(() => {});
+    }
+
     return updatedOrder;
   }
 
   async clearAllOrders(): Promise<void> {
     this.saveOrdersSync([]);
+    if (typeof window !== 'undefined' && 'fetch' in window) {
+      fetch('/api/orders', { method: 'DELETE' }).catch(() => {});
+    }
   }
 
   subscribeToOrders(callback: OrderSubscriptionListener): () => void {
