@@ -148,7 +148,7 @@ export const OrderTracker: React.FC<OrderTrackerProps> = ({
       {orders.length > 1 && (
         <div className="mt-4 pt-3 border-t border-neutral-800/80">
           <span className="text-[10px] font-semibold text-neutral-400 uppercase tracking-wider block mb-2">
-            Earlier Orders at Table {currentOrder.table_label} ({orders.length})
+            Your Orders This Visit ({orders.length})
           </span>
           <div className="flex gap-2 overflow-x-auto no-scrollbar">
             {orders.map((o) => (

@@ -348,7 +348,6 @@ export class SupabaseAdapter implements MenuRepository, OrderRepository {
   async createOrder(
     orderInput: Omit<Order, 'id' | 'created_at' | 'updated_at'>
   ): Promise<Order> {
-    // Invoke create-order Edge Function (server calculates prices and validates)
     const clientRequestId = `cr_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 
     const payload = {
@@ -363,22 +362,45 @@ export class SupabaseAdapter implements MenuRepository, OrderRepository {
       })),
     };
 
-    const { data, error } = await supabase.functions.invoke('create-order', {
-      body: payload,
-    });
+    let publicToken: string | null = null;
 
-    if (error || !data) {
-      throw new Error(error?.message || 'Failed to place order');
+    // 1. Try invoking create-order Edge Function first
+    try {
+      const { data, error } = await supabase.functions.invoke('create-order', {
+        body: payload,
+      });
+
+      if (!error && data?.public_token) {
+        publicToken = data.public_token;
+      }
+    } catch {
+      // Edge Function not reachable or not deployed; fallback to direct RPC below
     }
 
-    if (data.public_token) {
-      this.saveToken(data.public_token);
+    // 2. Fallback: Invoke create_order_direct RPC in database
+    if (!publicToken) {
+      const { data: rpcData, error: rpcErr } = await supabase.rpc('create_order_direct', {
+        p_table_label: payload.table_label,
+        p_customer_name: payload.customer_name,
+        p_note: payload.note || null,
+        p_client_request_id: payload.client_request_id,
+        p_items: payload.items,
+      });
+
+      if (rpcErr || !rpcData?.public_token) {
+        throw new Error(rpcErr?.message || 'Failed to place order via Supabase backend');
+      }
+
+      publicToken = rpcData.public_token;
     }
+
+    const finalToken: string = publicToken!;
+    this.saveToken(finalToken);
 
     // Fetch the newly created order via token
     const { data: createdOrder, error: getErr } = await supabase.rpc(
       'get_order_by_token',
-      { p_token: data.public_token }
+      { p_token: finalToken }
     );
 
     if (getErr || !createdOrder) {

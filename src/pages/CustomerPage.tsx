@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useRef } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import confetti from 'canvas-confetti';
 import { TableGuard } from '../components/customer/TableGuard';
 import { NamePromptModal } from '../components/customer/NamePromptModal';
@@ -26,6 +26,7 @@ function clearCustomerSession(tableLabel: string) {
   try {
     sessionStorage.removeItem(`ritsu_cust_name_${tableLabel}`);
     sessionStorage.removeItem('ritsu_current_table');
+    sessionStorage.removeItem(`ritsu_session_orders_${tableLabel.toUpperCase()}`);
     // Also clear any stored order tokens so no stale orders appear
     localStorage.removeItem('ritsu_customer_order_tokens');
   } catch {
@@ -60,9 +61,30 @@ const CustomerPageContent: React.FC<{ tableLabel: string }> = ({ tableLabel }) =
 
   // Thank-you / auto-logout state
   const [isPaidOut, setIsPaidOut] = useState<boolean>(false);
-  // Track orders that were already in a non-paid state so we don't trigger on
-  // stale paid orders that existed before this session started.
-  const sessionOrderIdsRef = useRef<Set<string>>(new Set());
+
+  const sessionOrdersKey = `ritsu_session_orders_${tableLabel.toUpperCase()}`;
+
+  // Session-scoped order IDs placed by this customer during their current dining visit.
+  // Historical / previous customer orders are completely excluded and never remembered.
+  const [sessionOrderIds, setSessionOrderIds] = useState<string[]>(() => {
+    try {
+      const raw = sessionStorage.getItem(sessionOrdersKey);
+      return raw ? JSON.parse(raw) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  const recordNewSessionOrder = (orderId: string) => {
+    setSessionOrderIds((prev) => {
+      if (prev.includes(orderId)) return prev;
+      const updated = [...prev, orderId];
+      try {
+        sessionStorage.setItem(sessionOrdersKey, JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
+  };
 
   // Data hooks
   const { categories, items, loading: menuLoading } = useMenu();
@@ -79,27 +101,20 @@ const CustomerPageContent: React.FC<{ tableLabel: string }> = ({ tableLabel }) =
   } = useCart();
   const { orders: tableOrders, createOrder } = useOrders({ tableLabel });
 
-  // Track which order IDs were placed in this session (we care about orders
-  // placed from this device / session)
-  useEffect(() => {
-    tableOrders.forEach((o) => {
-      if (o.payment_status !== 'paid') {
-        sessionOrderIdsRef.current.add(o.id);
-      }
-    });
-  }, [tableOrders]);
+  // Only orders placed by THIS customer in THIS active dining session.
+  // Never show historical / earlier orders from other customers or previous visits!
+  const sessionOrders = useMemo(() => {
+    if (sessionOrderIds.length === 0) return [];
+    return tableOrders.filter((o) => sessionOrderIds.includes(o.id));
+  }, [tableOrders, sessionOrderIds]);
 
-  // Auto-logout: when every order tracked in this session becomes paid,
-  // show the thank-you screen and reset after a short delay.
+  // Auto-logout: when every order placed in this active session becomes paid,
+  // show the thank-you screen and reset the table after a short delay.
   useEffect(() => {
-    if (isPaidOut) return; // already triggered
-    const trackedIds = sessionOrderIdsRef.current;
-    if (trackedIds.size === 0) return; // nothing ordered yet in this session
+    if (isPaidOut) return;
+    if (sessionOrderIds.length === 0 || sessionOrders.length === 0) return;
 
-    const allPaid = [...trackedIds].every((id) => {
-      const order = tableOrders.find((o) => o.id === id);
-      return order && order.payment_status === 'paid';
-    });
+    const allPaid = sessionOrders.every((order) => order.payment_status === 'paid');
 
     if (allPaid) {
       setIsPaidOut(true);
@@ -109,7 +124,7 @@ const CustomerPageContent: React.FC<{ tableLabel: string }> = ({ tableLabel }) =
         clearCustomerSession(tableLabel);
       }, 4000);
     }
-  }, [tableOrders, tableLabel, isPaidOut]);
+  }, [sessionOrders, sessionOrderIds, tableLabel, isPaidOut]);
 
   // Thank-you / paid-out screen
   if (isPaidOut) {
@@ -218,6 +233,7 @@ const CustomerPageContent: React.FC<{ tableLabel: string }> = ({ tableLabel }) =
         });
       } catch {}
 
+      recordNewSessionOrder(newOrder.id);
       clearCart();
       setIsCartOpen(false);
       setSelectedTrackingOrderId(newOrder.id);
@@ -258,11 +274,11 @@ const CustomerPageContent: React.FC<{ tableLabel: string }> = ({ tableLabel }) =
       />
 
       <main className="max-w-4xl mx-auto">
-        {/* Active Orders Live Tracker */}
-        {tableOrders.length > 0 && (
+        {/* Active Orders Live Tracker - only for orders placed in this session */}
+        {sessionOrders.length > 0 && (
           <div className="px-4 pt-4">
             <OrderTracker
-              orders={tableOrders}
+              orders={sessionOrders}
               activeOrderId={selectedTrackingOrderId}
               onSelectOrder={(id) => setSelectedTrackingOrderId(id)}
               onOpenReceipt={(order) => setActiveReceiptOrder(order)}
@@ -395,7 +411,7 @@ const CustomerPageContent: React.FC<{ tableLabel: string }> = ({ tableLabel }) =
       {activeReceiptOrder && (
         <ReceiptView
           order={activeReceiptOrder}
-          allTableOrders={tableOrders}
+          allTableOrders={sessionOrders}
           onClose={() => setActiveReceiptOrder(null)}
         />
       )}
