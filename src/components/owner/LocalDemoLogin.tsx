@@ -14,9 +14,7 @@ export const LocalDemoLogin: React.FC<LocalDemoLoginProps> = ({ onSuccess }) => 
   const [error, setError] = useState<string | null>(null);
   const [lockoutRemaining, setLockoutRemaining] = useState<number>(0);
 
-  const demoPassword =
-    import.meta.env.VITE_DEMO_OWNER_PASSWORD ||
-    (import.meta.env.VITE_DATA_BACKEND === 'supabase' ? '' : atob('YWRtaW4xMjM='));
+  const demoPassword = import.meta.env.VITE_DEMO_OWNER_PASSWORD || atob('YWRtaW4xMjM=');
 
   useEffect(() => {
     const checkLockout = () => {
