@@ -25,3 +25,9 @@ dist-ssr
 .env
 .env*.local
 supabase/.temp
+
+# Database runtime files
+data/
+*.db
+*.db-wal
+*.db-shm
