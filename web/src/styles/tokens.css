@@ -1,0 +1,64 @@
+:root {
+  /* Light Theme (Warm Ivory) - Default */
+  --bg-canvas: #FAF8F5;
+  --bg-surface: #FFFFFF;
+  --bg-surface-elevated: #F4EFEA;
+  --border-hairline: #E8E2D9;
+  --border-gold: #B8860B;
+  --gold-ink: #996515;
+  --gold-ink-contrast: #FFFFFF;
+  --text-primary: #1A1817;
+  --text-secondary: #5C554E;
+  --text-tertiary: #8C8379;
+  --veg-dot: #2E7D32;
+  --non-veg-dot: #C62828;
+  --status-pending: #8A5800;
+  --status-preparing: #0277BD;
+  --status-ready: #2E7D32;
+  --status-complete: #424242;
+  --status-cancelled: #B71C1C;
+
+  /* Fonts */
+  --font-serif: 'Cormorant Garamond', Georgia, serif;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+[data-theme="light"] {
+  --bg-canvas: #FAF8F5;
+  --bg-surface: #FFFFFF;
+  --bg-surface-elevated: #F4EFEA;
+  --border-hairline: #E8E2D9;
+  --border-gold: #B8860B;
+  --gold-ink: #996515;
+  --gold-ink-contrast: #FFFFFF;
+  --text-primary: #1A1817;
+  --text-secondary: #5C554E;
+  --text-tertiary: #8C8379;
+  --veg-dot: #2E7D32;
+  --non-veg-dot: #C62828;
+  --status-pending: #8A5800;
+  --status-preparing: #0277BD;
+  --status-ready: #2E7D32;
+  --status-complete: #424242;
+  --status-cancelled: #B71C1C;
+}
+
+[data-theme="dark"] {
+  --bg-canvas: #121212;
+  --bg-surface: #1A1918;
+  --bg-surface-elevated: #242220;
+  --border-hairline: #33302C;
+  --border-gold: #D4AF37;
+  --gold-ink: #D4AF37;
+  --gold-ink-contrast: #121212;
+  --text-primary: #F5F2EB;
+  --text-secondary: #AAA297;
+  --text-tertiary: #6B645D;
+  --veg-dot: #4CAF50;
+  --non-veg-dot: #EF5350;
+  --status-pending: #FFC107;
+  --status-preparing: #29B6F6;
+  --status-ready: #66BB6A;
+  --status-complete: #9E9E9E;
+  --status-cancelled: #E57373;
+}

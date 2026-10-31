@@ -41,3 +41,22 @@ Date: 2026-10-31 10:48:22
 5. Owner updates status via protected routes -> enforces state machine, broadcasts updates
 
 ## 4. Tests
+## 4. Tests Inventory
+- Shared: pricing.test.ts, stateMachine.test.ts, cartLogic.test.ts
+- Server: api.test.ts
+## 5. Baseline Testing Results
+npm test: all shared + server tests pass (20 + 6 = 26 tests)
+npm run lint: no output/errors shown
+npm run build: FAILS (server TS errors)
+### Build Errors
+1. server/src/db.ts:21 - DatabaseSync type issue
+2. server/src/index.ts:65,68,72,78 - unknown error type
+3. server/src/services/orderService.ts:240,286,308 - type mismatch passing Order to notifyOrderUpdated
+## 6. Prioritization Matrix
+### P0 (Critical)
+- Build broken - TypeScript errors prevent deployment
+- Server/SSE type issues in orderService
+### P1 (Important)
+- Review requirements A-D compliance - need full audit against specs
+### P2 (Polish)
+- Documentation, cleanup
