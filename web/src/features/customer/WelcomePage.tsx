@@ -52,7 +52,7 @@ export const WelcomePage: React.FC<WelcomePageProps> = ({ onStartOrdering }) => 
     apiAdapter
       .getRestaurantSettings()
       .then((s) => setPhone(s.phone))
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   const handleSubmit = (e: React.FormEvent) => {

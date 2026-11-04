@@ -156,7 +156,7 @@ export const MenuPage: React.FC<MenuPageProps> = ({
         const tokens = JSON.parse(localStorage.getItem('ritsu_orders') || '[]');
         tokens.unshift(order.public_token);
         localStorage.setItem('ritsu_orders', JSON.stringify(tokens.slice(0, 10)));
-      } catch {}
+      } catch { }
 
       onOrderPlaced(order);
     } catch (err: any) {
@@ -220,33 +220,30 @@ export const MenuPage: React.FC<MenuPageProps> = ({
           <button
             type="button"
             onClick={() => setDietFilter('all')}
-            className={`px-2.5 py-1 text-[12px] uppercase tracking-wider rounded-[2px] border font-medium transition-colors ${
-              dietFilter === 'all'
-                ? 'bg-[var(--gold-ink)] text-[var(--gold-ink-contrast)] border-transparent'
-                : 'bg-[var(--bg-surface)] text-[var(--text-secondary)] border-[var(--border-hairline)] hover:border-[var(--border-gold)]'
-            }`}
+            className={`px-2.5 py-1 text-[12px] uppercase tracking-wider rounded-[2px] border font-medium transition-colors ${dietFilter === 'all'
+              ? 'bg-[var(--gold-ink)] text-[var(--gold-ink-contrast)] border-transparent'
+              : 'bg-[var(--bg-surface)] text-[var(--text-secondary)] border-[var(--border-hairline)] hover:border-[var(--border-gold)]'
+              }`}
           >
             All
           </button>
           <button
             type="button"
             onClick={() => setDietFilter('veg')}
-            className={`px-2.5 py-1 text-[12px] uppercase tracking-wider rounded-[2px] border font-medium transition-colors ${
-              dietFilter === 'veg'
-                ? 'bg-[var(--veg-dot)] text-white border-transparent'
-                : 'bg-[var(--bg-surface)] text-[var(--text-secondary)] border-[var(--border-hairline)] hover:border-[var(--veg-dot)]'
-            }`}
+            className={`px-2.5 py-1 text-[12px] uppercase tracking-wider rounded-[2px] border font-medium transition-colors ${dietFilter === 'veg'
+              ? 'bg-[var(--veg-dot)] text-white border-transparent'
+              : 'bg-[var(--bg-surface)] text-[var(--text-secondary)] border-[var(--border-hairline)] hover:border-[var(--veg-dot)]'
+              }`}
           >
             🟢 Veg
           </button>
           <button
             type="button"
             onClick={() => setDietFilter('non_veg')}
-            className={`px-2.5 py-1 text-[12px] uppercase tracking-wider rounded-[2px] border font-medium transition-colors ${
-              dietFilter === 'non_veg'
-                ? 'bg-[var(--non-veg-dot)] text-white border-transparent'
-                : 'bg-[var(--bg-surface)] text-[var(--text-secondary)] border-[var(--border-hairline)] hover:border-[var(--non-veg-dot)]'
-            }`}
+            className={`px-2.5 py-1 text-[12px] uppercase tracking-wider rounded-[2px] border font-medium transition-colors ${dietFilter === 'non_veg'
+              ? 'bg-[var(--non-veg-dot)] text-white border-transparent'
+              : 'bg-[var(--bg-surface)] text-[var(--text-secondary)] border-[var(--border-hairline)] hover:border-[var(--non-veg-dot)]'
+              }`}
           >
             🔴 Non-Veg
           </button>

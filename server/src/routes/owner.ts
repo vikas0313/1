@@ -243,6 +243,63 @@ export const ownerRoutes: FastifyPluginAsync = async (fastify) => {
     return reply.send(tables);
   });
 
+  // POST /api/owner/tables
+  fastify.post('/tables', { preHandler: [requireOwnerAuth] }, async (req, reply) => {
+    const db = getDb();
+    const { label } = req.body as { label: string };
+    if (!label || !label.trim()) {
+      return reply.status(400).send({ error: 'Table label is required' });
+    }
+    const cleanLabel = label.trim().toUpperCase();
+    const id = `tbl-${cleanLabel.toLowerCase()}-${Date.now().toString(36)}`;
+    const maxSortRow = db.prepare('SELECT MAX(sort_order) as max_sort FROM tables').get() as any;
+    const sortOrder = (maxSortRow?.max_sort || 0) + 1;
+
+    try {
+      db.prepare('INSERT INTO tables (id, label, active, sort_order) VALUES (?, ?, 1, ?)').run(id, cleanLabel, sortOrder);
+      return reply.status(201).send({ id, label: cleanLabel, active: true, sort_order: sortOrder });
+    } catch (err: any) {
+      return reply.status(400).send({ error: 'Table label already exists or invalid' });
+    }
+  });
+
+  // PATCH /api/owner/tables/:id
+  fastify.patch('/tables/:id', { preHandler: [requireOwnerAuth] }, async (req, reply) => {
+    const { id } = req.params as { id: string };
+    const { active } = req.body as { active: boolean };
+    const db = getDb();
+    db.prepare('UPDATE tables SET active = ? WHERE id = ?').run(active ? 1 : 0, id);
+    return reply.send({ success: true, id, active });
+  });
+
+  // GET /api/owner/settings
+  fastify.get('/settings', { preHandler: [requireOwnerAuth] }, async (_req, reply) => {
+    const db = getDb();
+    const row = db.prepare('SELECT * FROM restaurant_settings WHERE id = 1').get();
+    return reply.send(row || {});
+  });
+
+  // PATCH /api/owner/settings
+  fastify.patch('/settings', { preHandler: [requireOwnerAuth] }, async (req, reply) => {
+    const db = getDb();
+    const { name, tagline, phone, address, gstin, upi_vpa } = req.body as any;
+    const updates: string[] = [];
+    const values: any[] = [];
+
+    if (name !== undefined) { updates.push('name = ?'); values.push(name); }
+    if (tagline !== undefined) { updates.push('tagline = ?'); values.push(tagline); }
+    if (phone !== undefined) { updates.push('phone = ?'); values.push(phone); }
+    if (address !== undefined) { updates.push('address = ?'); values.push(address); }
+    if (gstin !== undefined) { updates.push('gstin = ?'); values.push(gstin); }
+    if (upi_vpa !== undefined) { updates.push('upi_vpa = ?'); values.push(upi_vpa); }
+
+    if (updates.length > 0) {
+      db.prepare(`UPDATE restaurant_settings SET ${updates.join(', ')} WHERE id = 1`).run(...values);
+    }
+    const row = db.prepare('SELECT * FROM restaurant_settings WHERE id = 1').get();
+    return reply.send(row || {});
+  });
+
   // GET /api/owner/backup - Download raw SQLite file
   fastify.get('/backup', { preHandler: [requireOwnerAuth] }, async (_req, reply) => {
     const dbPath = path.isAbsolute(config.DATABASE_PATH)
