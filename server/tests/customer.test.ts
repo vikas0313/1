@@ -140,3 +140,4 @@ describe('Phase 2 Customer App Tests', () => {
     expect(localStorage.getItem(ownerKey)).toBe('light');
   });
 });
+

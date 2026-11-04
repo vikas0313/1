@@ -1,46 +1,53 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍜</text></svg>" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <meta id="theme-color-meta" name="theme-color" content="#FAF8F5" />
-    <title>Ritsu Food Corner | Indo-Chinese QR Dining</title>
-    <meta name="description" content="Indo-Chinese ka asli maza – Ritsu ke saath! Order directly from your table via QR code." />
 
-    <!-- Google Fonts for Cormorant Garamond & Inter -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍜</text></svg>" />
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta id="theme-color-meta" name="theme-color" content="#FAF8F5" />
+  <title>Ritsu Food Corner | Indo-Chinese QR Dining</title>
+  <meta name="description"
+    content="Indo-Chinese ka asli maza – Ritsu ke saath! Order directly from your table via QR code." />
 
-    <!-- Inline theme script to prevent Flash of Unstyled Theme (FOUT) -->
-    <script>
-      (function() {
-        try {
-          var isOwner = window.location.pathname.startsWith('/owner');
-          var key = isOwner ? 'ritsu-theme-owner' : 'ritsu-theme-customer';
-          var stored = localStorage.getItem(key);
-          var theme = 'light'; // Default to Ivory Light theme
+  <!-- Google Fonts for Cormorant Garamond & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet" />
 
-          if (stored === 'light' || stored === 'dark') {
-            theme = stored;
-          } else if (stored === 'system' || !stored) {
-            theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-          }
+  <!-- Inline theme script to prevent Flash of Unstyled Theme (FOUT) -->
+  <script>
+    (function () {
+      try {
+        var isOwner = window.location.pathname.startsWith('/owner');
+        var key = isOwner ? 'ritsu-theme-owner' : 'ritsu-theme-customer';
+        var stored = localStorage.getItem(key);
+        var theme = 'light'; // Default to Ivory Light theme
 
-          document.documentElement.setAttribute('data-theme', theme);
-          document.documentElement.style.colorScheme = theme;
-          var meta = document.getElementById('theme-color-meta');
-          if (meta) {
-            meta.setAttribute('content', theme === 'dark' ? '#121212' : '#FAF8F5');
-          }
-        } catch (e) {}
-      })();
-    </script>
-  </head>
-  <body class="antialiased">
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+        if (stored === 'light' || stored === 'dark') {
+          theme = stored;
+        } else if (stored === 'system' || !stored) {
+          theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+
+        document.documentElement.setAttribute('data-theme', theme);
+        document.documentElement.style.colorScheme = theme;
+        var meta = document.getElementById('theme-color-meta');
+        if (meta) {
+          meta.setAttribute('content', theme === 'dark' ? '#121212' : '#FAF8F5');
+        }
+      } catch (e) { }
+    })();
+  </script>
+</head>
+
+<body class="antialiased">
+  <div id="root"></div>
+  <script type="module" src="/src/main.tsx"></script>
+</body>
+
 </html>
-

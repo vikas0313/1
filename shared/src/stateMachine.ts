@@ -27,10 +27,10 @@ export function canTransition(current: OrderStatus, next: OrderStatus): boolean 
 
 export function getNextStep(current: OrderStatus): OrderStatus | null {
   switch (current) {
-    case 'pending':   return 'preparing';
+    case 'pending': return 'preparing';
     case 'preparing': return 'ready';
-    case 'ready':     return 'complete';
-    default:          return null;
+    case 'ready': return 'complete';
+    default: return null;
   }
 }
 

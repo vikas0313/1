@@ -42,7 +42,7 @@ export const PaymentPage: React.FC<PaymentPageProps> = ({
           },
         }).then(setQrDataUrl);
       })
-      .catch(() => {});
+      .catch(() => { });
   }, [order]);
 
   const upiVpa = settings?.upi_vpa || 'ritsu@upi';
