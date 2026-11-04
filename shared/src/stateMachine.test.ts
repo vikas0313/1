@@ -52,3 +52,4 @@ describe('State Machine (shared/stateMachine)', () => {
     expect(VALID_TRANSITIONS.pending).toEqual(['preparing', 'cancelled']);
   });
 });
+

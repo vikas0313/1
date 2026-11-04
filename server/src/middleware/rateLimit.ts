@@ -53,3 +53,4 @@ export const loginRateLimiter = createRateLimiter({
   windowMs: 60 * 60 * 1000,
   message: 'Too many login attempts. Please wait an hour before trying again.',
 });
+

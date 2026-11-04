@@ -272,3 +272,4 @@ export function generateSeedMenuItems(): MenuItem[] {
 }
 
 export const SEED_MENU_ITEMS: MenuItem[] = generateSeedMenuItems();
+

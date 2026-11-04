@@ -118,3 +118,4 @@ describe('cartLogic', () => {
     expect(getCartTotalCount(cart)).toBe(6);
   });
 });
+

@@ -35,3 +35,4 @@ export const SizeLabel: React.FC<SizeLabelProps> = ({
     </button>
   );
 };
+

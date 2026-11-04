@@ -36,3 +36,4 @@ for (const item of SEED_MENU_ITEMS) {
 const outPath = path.resolve(__dirname, '../migrations/003_seed_menu.sql');
 fs.writeFileSync(outPath, sql, 'utf8');
 console.log(`Generated migration: ${outPath} with ${SEED_MENU_ITEMS.length} items`);
+

@@ -18,10 +18,10 @@ export interface ExtendedDatabase {
 }
 
 class DatabaseWrapper implements ExtendedDatabase {
-  private db: DatabaseSync;
+  private db: any;
 
   constructor(filePath: string) {
-    this.db = new DatabaseSync(filePath);
+    this.db = new (DatabaseSync as any)(filePath);
     this.exec('PRAGMA journal_mode = WAL;');
     this.exec('PRAGMA foreign_keys = ON;');
     this.exec('PRAGMA busy_timeout = 5000;');

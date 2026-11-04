@@ -23,3 +23,4 @@ export const MenuRowSkeleton: React.FC = () => {
     </div>
   );
 };
+

@@ -49,3 +49,4 @@ describe('Pricing Engine (shared/pricing)', () => {
     expect(formatINR(14000, false)).toMatch(/140/);
   });
 });
+

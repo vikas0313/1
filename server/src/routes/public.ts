@@ -90,3 +90,4 @@ export const publicRoutes: FastifyPluginAsync = async (fastify) => {
     sseService.addClient(reply, `order:${public_token}`);
   });
 };
+

@@ -93,3 +93,4 @@ export function mergeCartLines(cartA: CartLine[], cartB: CartLine[]): CartLine[]
 export function getCartTotalCount(cart: CartLine[]): number {
   return cart.reduce((sum, line) => sum + line.quantity, 0);
 }
+

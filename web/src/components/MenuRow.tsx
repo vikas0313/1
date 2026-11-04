@@ -133,3 +133,4 @@ export const MenuRow: React.FC<MenuRowProps> = ({
     </article>
   );
 };
+

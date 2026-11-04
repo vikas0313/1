@@ -154,3 +154,4 @@ export const WelcomePage: React.FC<WelcomePageProps> = ({ onStartOrdering }) => 
     </div>
   );
 };
+

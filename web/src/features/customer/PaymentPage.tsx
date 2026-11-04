@@ -150,3 +150,4 @@ export const PaymentPage: React.FC<PaymentPageProps> = ({
     </div>
   );
 };
+

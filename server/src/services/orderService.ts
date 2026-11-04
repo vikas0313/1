@@ -202,7 +202,7 @@ export class OrderService {
     const createdOrder = this.findById(orderId)!;
 
     // 5. Broadcast to owners via SSE
-    sseService.notifyOrderCreated(createdOrder);
+    sseService.notifyOrderCreated(createdOrder as any);
 
     return createdOrder;
   }
@@ -237,7 +237,7 @@ export class OrderService {
     })();
 
     const updated = this.findById(orderId)!;
-    sseService.notifyOrderUpdated(updated);
+    sseService.notifyOrderUpdated(updated as any);
     return updated;
   }
 
@@ -283,7 +283,7 @@ export class OrderService {
     })();
 
     const updated = this.findById(orderId)!;
-    sseService.notifyOrderUpdated(updated);
+    sseService.notifyOrderUpdated(updated as any);
     return updated;
   }
 
@@ -305,7 +305,7 @@ export class OrderService {
     `).run(now, orderId);
 
     const updated = this.findById(orderId)!;
-    sseService.notifyOrderUpdated(updated);
+    sseService.notifyOrderUpdated(updated as any);
     return updated;
   }
 
@@ -383,3 +383,4 @@ export class OrderService {
 }
 
 export const orderService = new OrderService();
+

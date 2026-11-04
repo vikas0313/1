@@ -204,3 +204,4 @@ export const BillPage: React.FC<BillPageProps> = ({
     </div>
   );
 };
+

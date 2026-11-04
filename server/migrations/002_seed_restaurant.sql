@@ -32,3 +32,4 @@ INSERT OR IGNORE INTO tables (id, label, active, sort_order) VALUES
   ('tbl-6', 'T6', 1, 6),
   ('tbl-7', 'T7', 1, 7),
   ('tbl-8', 'T8', 1, 8);
+
