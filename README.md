@@ -45,8 +45,8 @@ ritsu-food-corner/
 │       ├── features/
 │       │   ├── customer/  Welcome → Menu → Cart → Payment → Tracking → Bill
 │       │   └── owner/     Login → Kanban → Menu Manager → Tables & QR → Sales → Settings
-│       ├── services/      AlertService (Web Audio + SpeechSynthesis)
-│       └── styles/        Heritage Gold tokens, global CSS, print rules
+│       ├── services/      AlertService (Web Audio + SpeechSynthesis order announcements)
+│       └── styles/        Warm Peach design tokens, global CSS, print rules
 ├── docs/            Deployment guides (Render, Fly.io, Cloudflare Tunnel)
 ├── Dockerfile       Multi-stage production build
 ├── render.yaml      Render.com blueprint
