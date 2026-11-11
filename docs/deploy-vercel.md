@@ -51,3 +51,4 @@ Vercel will install workspace dependencies, compile `@ritsu/shared`, build the V
    - Added `npm run build:web` in `package.json` and `vercel.json` so Vercel builds the shared package and web bundle without requiring unnecessary native server compilation steps on serverless edge runners.
 4. **SPA Client-Side Routing**:
    - Configured `vercel.json` rewrites (`/((?!api/).*)` → `/index.html`) so refreshing owner screens (`/owner`, `/owner/orders`, `/owner/menu`) never produces `404: NOT_FOUND`.
+

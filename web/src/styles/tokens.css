@@ -1,64 +1,113 @@
-:root {
-  /* Light Theme (Warm Ivory) - Default */
-  --bg-canvas: #FAF8F5;
-  --bg-surface: #FFFFFF;
-  --bg-surface-elevated: #F4EFEA;
-  --border-hairline: #E8E2D9;
-  --border-gold: #B8860B;
-  --gold-ink: #996515;
-  --gold-ink-contrast: #FFFFFF;
-  --text-primary: #1A1817;
-  --text-secondary: #5C554E;
-  --text-tertiary: #8C8379;
-  --veg-dot: #2E7D32;
-  --non-veg-dot: #C62828;
-  --status-pending: #8A5800;
-  --status-preparing: #0277BD;
-  --status-ready: #2E7D32;
-  --status-complete: #424242;
-  --status-cancelled: #B71C1C;
+/* ==========================================================================
+   WARM PEACH DESIGN SYSTEM TOKENS
+   Customer & Owner unified theme for Mobile, Tablet, and Laptop
+   ========================================================================== */
 
-  /* Fonts */
-  --font-serif: 'Cormorant Garamond', Georgia, serif;
-  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+:root,
+:root[data-theme="light"] {
+  /* Surface & Canvas (Light "Cream") */
+  --bg: #F3EFE7;
+  --surface: #FFFFFF;
+  --surface-2: #E9E5DA;
+  --border: #E2DDD0;
+  --page-backdrop: #D6CCC1;
+
+  /* Typography */
+  --text: #222222;
+  --text-muted: #7E796F;
+
+  /* Accents */
+  --accent: #F9A06A;
+  --accent-ink: #B84F14;
+  --on-accent: #1F1F1F;
+
+  /* Navigation & Action Buttons */
+  --nav: #2A2A2A;
+  --on-nav: #F5F1E8;
+  --btn: #2A2A2A;
+  --on-btn: #F5F1E8;
+
+  /* Status Tokens */
+  --veg: #2E7D4F;
+  --nonveg: #B3302A;
+  --success: #2F6B3F;
+  --warning: #A8710F;
+  --danger: #B3302A;
+  --status-pending: #5F6B7A;
+  --status-preparing: #F9A06A;
+  --status-ready: #2F6B3F;
+  --status-complete: #8A8578;
+  --status-cancelled: #8C2F2B;
+
+  /* Shadows */
+  --shadow-card: 0 12px 32px rgba(0, 0, 0, 0.08);
+  --shadow-sheet: 0 -12px 32px rgba(0, 0, 0, 0.16);
+  --shadow-nav: 0 8px 24px rgba(0, 0, 0, 0.12);
+
+  /* Legacy token compatibility bridge */
+  --bg-canvas: var(--bg);
+  --bg-surface: var(--surface);
+  --bg-card: var(--surface);
+  --border-default: var(--border);
+  --border-subtle: var(--border);
+  --text-primary: var(--text);
+  --text-secondary: var(--text-muted);
+  --gold-ink: var(--accent-ink);
+  --gold-accent: var(--accent);
+
+  color-scheme: light;
 }
 
-[data-theme="light"] {
-  --bg-canvas: #FAF8F5;
-  --bg-surface: #FFFFFF;
-  --bg-surface-elevated: #F4EFEA;
-  --border-hairline: #E8E2D9;
-  --border-gold: #B8860B;
-  --gold-ink: #996515;
-  --gold-ink-contrast: #FFFFFF;
-  --text-primary: #1A1817;
-  --text-secondary: #5C554E;
-  --text-tertiary: #8C8379;
-  --veg-dot: #2E7D32;
-  --non-veg-dot: #C62828;
-  --status-pending: #8A5800;
-  --status-preparing: #0277BD;
-  --status-ready: #2E7D32;
-  --status-complete: #424242;
-  --status-cancelled: #B71C1C;
-}
+:root[data-theme="dark"] {
+  /* Surface & Canvas (Dark "Cocoa") */
+  --bg: #171514;
+  --surface: #232120;
+  --surface-2: #2E2B29;
+  --border: #3A3633;
+  --page-backdrop: #0F0E0D;
 
-[data-theme="dark"] {
-  --bg-canvas: #121212;
-  --bg-surface: #1A1918;
-  --bg-surface-elevated: #242220;
-  --border-hairline: #33302C;
-  --border-gold: #D4AF37;
-  --gold-ink: #D4AF37;
-  --gold-ink-contrast: #121212;
-  --text-primary: #F5F2EB;
-  --text-secondary: #AAA297;
-  --text-tertiary: #6B645D;
-  --veg-dot: #4CAF50;
-  --non-veg-dot: #EF5350;
-  --status-pending: #FFC107;
-  --status-preparing: #29B6F6;
-  --status-ready: #66BB6A;
-  --status-complete: #9E9E9E;
-  --status-cancelled: #E57373;
+  /* Typography */
+  --text: #F2EDE4;
+  --text-muted: #A39C90;
+
+  /* Accents */
+  --accent: #F9A06A;
+  --accent-ink: #FFB586;
+  --on-accent: #1F1F1F;
+
+  /* Navigation & Action Buttons (Primary buttons become peach in dark mode) */
+  --nav: #0F0E0D;
+  --on-nav: #F5F1E8;
+  --btn: #F9A06A;
+  --on-btn: #1F1F1F;
+
+  /* Status Tokens */
+  --veg: #389E62;
+  --nonveg: #D9463E;
+  --success: #389E62;
+  --warning: #D99B26;
+  --danger: #D9463E;
+  --status-pending: #8493A6;
+  --status-preparing: #F9A06A;
+  --status-ready: #389E62;
+  --status-complete: #9E988D;
+  --status-cancelled: #D9463E;
+
+  /* Shadows (Hairline borders in dark mode) */
+  --shadow-card: none;
+  --shadow-sheet: 0 -12px 32px rgba(0, 0, 0, 0.45);
+  --shadow-nav: none;
+
+  /* Legacy token compatibility bridge */
+  --bg-canvas: var(--bg);
+  --bg-surface: var(--surface);
+  --bg-card: var(--surface);
+  --border-default: var(--border);
+  --border-subtle: var(--border);
+  --text-primary: var(--text);
+  --text-secondary: var(--text-muted);
+  --gold-ink: var(--accent-ink);
+  --gold-accent: var(--accent);
+
+  color-scheme: dark;
 }

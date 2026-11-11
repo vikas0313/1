@@ -53,3 +53,6 @@ export function formatINR(paise: number, alwaysShowDecimals = true): string {
     maximumFractionDigits: 2,
   }).format(rupees);
 }
+
+export const formatPaise = formatINR;
+

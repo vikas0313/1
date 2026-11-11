@@ -59,13 +59,21 @@ let dbInstance: ExtendedDatabase | null = null;
 export function getDb(): ExtendedDatabase {
   if (dbInstance) return dbInstance;
 
-  const dbPath = path.isAbsolute(config.DATABASE_PATH)
-    ? config.DATABASE_PATH
-    : path.resolve(__dirname, '../../', config.DATABASE_PATH);
+  const rawPath = process.env.DATABASE_PATH || config.DATABASE_PATH;
+  let dbPath: string;
+  if (rawPath === ':memory:') {
+    dbPath = ':memory:';
+  } else if (path.isAbsolute(rawPath)) {
+    dbPath = rawPath;
+  } else {
+    dbPath = path.resolve(__dirname, '../../', rawPath);
+  }
 
-  const dbDir = path.dirname(dbPath);
-  if (!fs.existsSync(dbDir)) {
-    fs.mkdirSync(dbDir, { recursive: true });
+  if (dbPath !== ':memory:') {
+    const dbDir = path.dirname(dbPath);
+    if (!fs.existsSync(dbDir)) {
+      fs.mkdirSync(dbDir, { recursive: true });
+    }
   }
 
   const db = new DatabaseWrapper(dbPath);
