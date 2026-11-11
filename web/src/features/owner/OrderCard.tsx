@@ -93,142 +93,143 @@ export const OrderCard: React.FC<OrderCardProps> = ({
 
   return (
     <div
-      className={`bg-[var(--bg-card)] border ${
+      className={`warm-card p-4 sm:p-5 flex flex-col justify-between transition-all duration-200 ${
         isFresh
-          ? 'border-[var(--gold-ink)] ring-2 ring-[var(--gold-ink)]/30 animate-pulse'
-          : 'border-[var(--border-default)]'
-      } p-4 flex flex-col justify-between shadow-sm transition-all duration-200`}
+          ? 'border-[var(--accent)] ring-2 ring-[var(--accent)]/30 shadow-md animate-pulse'
+          : ''
+      }`}
     >
       <div>
-        {/* Top Header */}
-        <div className="flex items-start justify-between gap-2 border-b border-[var(--border-subtle)] pb-2 mb-3">
-          <div>
-            <div className="font-serif text-xl font-bold text-[var(--gold-ink)] tracking-tight">
-              Table {order.table_label.replace(/^T/i, '')}
+        {/* Top Header with Round Table Tile */}
+        <div className="flex items-start justify-between gap-3 pb-3 mb-3 border-b border-[var(--border)]">
+          <div className="flex items-center gap-3">
+            {/* Round tile showing the table number */}
+            <div className="w-13 h-13 rounded-2xl bg-[var(--accent)]/15 border border-[var(--accent)]/30 text-[var(--accent-ink)] flex flex-col items-center justify-center shrink-0 shadow-2xs">
+              <span className="text-[10px] font-bold uppercase leading-none text-[var(--text-muted)]">
+                Table
+              </span>
+              <span className="text-[20px] font-bold leading-tight tabular-nums">
+                {order.table_label.replace(/^T/i, '')}
+              </span>
             </div>
-            <div className="text-xs font-semibold text-[var(--text-primary)]">
-              {order.customer_name}
+
+            <div>
+              <div className="text-[15px] font-bold text-[var(--text)] leading-snug">
+                {order.customer_name}
+              </div>
+              <div className="text-[12px] text-[var(--text-muted)] mt-0.5">
+                Order #{order.order_no}
+              </div>
             </div>
           </div>
 
           <div className="text-right">
-            <span className="font-mono text-xs font-bold text-[var(--text-secondary)]">
-              #{order.order_no}
-            </span>
             <div
-              className={`flex items-center justify-end gap-1 text-[11px] font-mono mt-0.5 ${
-                isOverdue ? 'text-red-600 dark:text-red-400 font-bold' : 'text-[var(--text-muted)]'
+              className={`inline-flex items-center gap-1 text-[12px] font-semibold px-2.5 py-0.5 rounded-full ${
+                isOverdue
+                  ? 'bg-red-50 text-[var(--danger)] border border-red-200 dark:bg-red-950/40'
+                  : 'bg-[var(--surface-2)] text-[var(--text-muted)]'
               }`}
             >
               <Clock className="w-3 h-3" />
-              <span>{elapsedMinutes}m ago</span>
+              <span>{elapsedMinutes}m</span>
             </div>
           </div>
         </div>
 
-        {/* Status and Payment Badges */}
+        {/* Status and Payment Chips */}
         <div className="flex flex-wrap items-center gap-2 mb-3">
-          <Badge
-            status={
-              order.status === 'pending'
-                ? 'pending'
-                : order.status === 'preparing'
-                ? 'preparing'
-                : order.status === 'ready'
-                ? 'ready'
-                : order.status === 'complete'
-                ? 'complete'
-                : 'cancelled'
-            }
-          >
-            {order.status.toUpperCase()}
+          <Badge status={order.status}>
+            {order.status}
           </Badge>
 
           <span
-            className={`px-2 py-0.5 text-[10px] uppercase font-bold tracking-wider rounded ${
+            className={`px-2.5 py-0.5 text-[11px] font-semibold rounded-full border ${
               order.payment_status === 'paid'
-                ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'
+                ? 'bg-emerald-50 text-[var(--success)] border-emerald-200 dark:bg-emerald-950/40'
                 : order.payment_status === 'refunded'
-                ? 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20'
-                : 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20'
+                ? 'bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/40'
+                : 'bg-amber-50 text-[var(--warning)] border-amber-200 dark:bg-amber-950/40'
             }`}
           >
-            {order.payment_status.toUpperCase()}
+            {order.payment_status === 'paid' ? 'Paid' : order.payment_status === 'refunded' ? 'Refunded' : 'Unpaid'}
           </span>
 
           {order.payment_method && (
-            <span className="text-[10px] text-[var(--text-muted)] font-mono">
+            <span className="text-[11px] text-[var(--text-muted)] font-mono">
               ({order.payment_method})
             </span>
           )}
         </div>
 
         {/* Itemised Lines */}
-        <div className="space-y-1.5 border-t border-b border-[var(--border-subtle)] py-2 my-2 text-xs">
+        <div className="space-y-1.5 border-t border-b border-[var(--border)] py-2.5 my-2 text-[13px]">
           {order.items.map((it) => (
             <div key={it.id} className="flex justify-between items-baseline gap-2">
               <div className="flex items-baseline gap-1.5 flex-1 min-w-0">
-                <span className="font-bold text-[var(--text-primary)]">{it.quantity}×</span>
-                <span className="truncate text-[var(--text-primary)]">{it.item_name}</span>
+                <span className="font-bold text-[var(--text)] tabular-nums">{it.quantity}×</span>
+                <span className="truncate text-[var(--text)]">{it.item_name}</span>
                 {it.size_label && (
-                  <span className="text-[10px] px-1 bg-[var(--bg-canvas)] border border-[var(--border-default)] text-[var(--text-secondary)] rounded">
+                  <span className="text-[11px] px-2 py-0.2 bg-[var(--surface-2)] border border-[var(--border)] text-[var(--text-muted)] rounded-full">
                     {it.size_label}
                   </span>
                 )}
               </div>
-              <span className="font-mono text-[var(--text-secondary)]">
-                {formatPaise(it.unit_price_paise * it.quantity)}
+              <span className="tabular-nums font-medium text-[var(--text-muted)]">
+                {formatPaise(it.unit_price_paise * it.quantity, false)}
               </span>
             </div>
           ))}
 
           {order.special_instructions && (
-            <div className="p-1.5 bg-[var(--bg-canvas)] border border-amber-500/20 text-amber-700 dark:text-amber-300 text-[11px] rounded mt-1 italic">
-              Note: "{order.special_instructions}"
+            <div className="p-2 bg-[var(--surface-2)] border border-[var(--border)] text-[var(--text)] text-[12px] rounded-xl mt-1.5">
+              <span className="font-semibold text-[var(--accent-ink)]">Note:</span> "{order.special_instructions}"
             </div>
           )}
         </div>
 
-        {/* Bill Total */}
-        <div className="flex justify-between items-baseline pt-1 pb-3 text-xs">
-          <span className="text-[var(--text-secondary)] uppercase tracking-wider font-medium text-[11px]">
-            Total Bill
+        {/* Bill Total - Large Bold Figure */}
+        <div className="flex justify-between items-baseline pt-1 pb-3">
+          <span className="text-[12px] font-medium text-[var(--text-muted)]">
+            Total bill
           </span>
-          <span className="font-serif font-bold text-base text-[var(--text-primary)]">
-            {formatPaise(order.total_paise)}
+          <span className="text-[20px] font-bold tabular-nums text-[var(--text)]">
+            {formatPaise(order.total_paise, false)}
           </span>
         </div>
       </div>
 
       {/* Action Buttons */}
-      <div className="pt-2 border-t border-[var(--border-subtle)] space-y-2">
+      <div className="pt-3 border-t border-[var(--border)] space-y-2">
         {nextStep && (
           <Button
             variant="primary"
+            size="md"
             onClick={handleNextStep}
-            loading={actionLoading}
-            className="w-full py-2 text-xs uppercase font-bold tracking-wider"
+            isLoading={actionLoading}
+            className="w-full font-bold"
           >
             {nextButtonLabel[order.status]}
           </Button>
         )}
 
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-2">
           {order.payment_status === 'unpaid' && (
             <Button
               variant="secondary"
+              size="sm"
               onClick={() => setShowPaidDialog(true)}
-              className="flex-1 py-1.5 text-[11px] uppercase tracking-wider font-semibold"
+              className="flex-1 text-[12px] font-semibold"
             >
-              <DollarSign className="w-3.5 h-3.5 inline mr-1" />
-              Mark Paid
+              <DollarSign className="w-3.5 h-3.5 inline mr-1 text-[var(--accent-ink)]" />
+              Mark paid
             </Button>
           )}
 
           {order.payment_status === 'paid' && (
             <button
               onClick={() => setShowRefundDialog(true)}
-              className="flex-1 py-1 text-[11px] text-[var(--text-muted)] hover:text-purple-600 transition-colors"
+              className="touch-target flex-1 py-1 text-[12px] text-[var(--text-muted)] hover:text-purple-600 transition-colors"
             >
               Refund
             </button>
@@ -237,10 +238,10 @@ export const OrderCard: React.FC<OrderCardProps> = ({
           {(order.status === 'pending' || order.status === 'preparing') && (
             <button
               onClick={() => setShowCancelDialog(true)}
-              className="px-2.5 py-1 text-[11px] text-red-600 dark:text-red-400 hover:bg-red-500/10 rounded transition-colors"
-              title="Cancel Order"
+              className="touch-target px-3 py-1.5 text-[12px] text-[var(--danger)] hover:bg-red-50 dark:hover:bg-red-950/40 rounded-full transition-colors font-medium"
+              title="Cancel order"
             >
-              <XCircle className="w-3.5 h-3.5 inline mr-0.5" />
+              <XCircle className="w-3.5 h-3.5 inline mr-1" />
               Cancel
             </button>
           )}

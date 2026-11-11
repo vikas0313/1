@@ -251,65 +251,68 @@ export const MenuManagerPage: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Header and Actions */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[var(--border-default)] pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[var(--border)] pb-4">
         <div>
-          <h1 className="font-serif text-2xl font-bold text-[var(--text-primary)]">
-            Menu Manager
+          <h1 className="text-[22px] sm:text-[24px] font-bold text-[var(--text)]">
+            Menu manager
           </h1>
-          <p className="text-xs text-[var(--text-secondary)] font-serif italic">
-            Edit live restaurant items, prices, availability, and verify rates.
+          <p className="text-[13px] text-[var(--text-muted)] mt-0.5">
+            Manage live dishes, prices, availability, and verify price items.
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2.5">
           <Button
             variant="secondary"
+            size="sm"
             onClick={exportCSV}
-            className="text-xs py-1.5 px-3 inline-flex items-center gap-1.5"
+            className="inline-flex items-center gap-1.5"
           >
-            <FileSpreadsheet className="w-3.5 h-3.5" />
-            <span>CSV</span>
+            <FileSpreadsheet className="w-3.5 h-3.5 text-[var(--accent-ink)]" />
+            <span>Export CSV</span>
           </Button>
 
           <Button
             variant="secondary"
+            size="sm"
             onClick={exportJSON}
-            className="text-xs py-1.5 px-3 inline-flex items-center gap-1.5"
+            className="inline-flex items-center gap-1.5"
           >
-            <FileJson className="w-3.5 h-3.5" />
-            <span>JSON</span>
+            <FileJson className="w-3.5 h-3.5 text-[var(--accent-ink)]" />
+            <span>Export JSON</span>
           </Button>
 
           <Button
             variant="primary"
+            size="sm"
             onClick={() => setShowAddDialog(true)}
-            className="text-xs py-1.5 px-3 inline-flex items-center gap-1.5 tracking-wider font-semibold"
+            className="inline-flex items-center gap-1.5 font-semibold"
           >
-            <Plus className="w-3.5 h-3.5" />
-            <span>ADD DISH</span>
+            <Plus className="w-4 h-4" />
+            <span>Add dish</span>
           </Button>
         </div>
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="bg-[var(--bg-card)] border border-[var(--border-default)] p-3 sm:p-4 flex flex-wrap items-center gap-3">
-        <div className="relative flex-1 min-w-[200px]">
-          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" />
+      <div className="warm-card p-3 sm:p-4 flex flex-wrap items-center gap-3">
+        <div className="relative flex-1 min-w-[220px]">
+          <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search items by name or item number..."
-            className="w-full pl-9 pr-3 py-1.5 text-xs bg-[var(--bg-canvas)] border border-[var(--border-default)] text-[var(--text-primary)] rounded focus:outline-none focus:border-[var(--gold-ink)]"
+            className="touch-target w-full pl-10 pr-4 h-11 text-[13px] bg-[var(--surface-2)] border border-[var(--border)] text-[var(--text)] rounded-full focus:outline-none focus:border-[var(--accent)] focus:bg-[var(--surface)] transition-all"
           />
         </div>
 
         <select
           value={selectedCategory}
           onChange={(e) => setSelectedCategory(e.target.value)}
-          className="text-xs bg-[var(--bg-canvas)] border border-[var(--border-default)] rounded px-3 py-2 text-[var(--text-primary)]"
+          className="touch-target text-[13px] bg-[var(--surface-2)] border border-[var(--border)] rounded-full px-4 h-11 text-[var(--text)] focus:outline-none focus:border-[var(--accent)]"
         >
-          <option value="all">All 14 Categories</option>
+          <option value="all">All categories</option>
           {categories.map((c) => (
             <option key={c.id} value={c.id}>
               {c.name}
@@ -321,22 +324,22 @@ export const MenuManagerPage: React.FC = () => {
       {/* Items Table */}
       {loading ? (
         <div className="space-y-3">
-          <Skeleton className="h-10 w-full" />
-          <Skeleton className="h-16 w-full" />
-          <Skeleton className="h-16 w-full" />
-          <Skeleton className="h-16 w-full" />
+          <Skeleton className="h-12 w-full rounded-2xl" />
+          <Skeleton className="h-16 w-full rounded-2xl" />
+          <Skeleton className="h-16 w-full rounded-2xl" />
+          <Skeleton className="h-16 w-full rounded-2xl" />
         </div>
       ) : (
-        <div className="bg-[var(--bg-card)] border border-[var(--border-default)] overflow-x-auto shadow-xs">
-          <table className="w-full text-left text-xs border-collapse">
+        <div className="warm-card overflow-hidden shadow-xs">
+          <table className="w-full text-left text-[13px] border-collapse">
             <thead>
-              <tr className="border-b border-[var(--border-default)] bg-[var(--bg-surface)] text-[var(--text-secondary)] uppercase tracking-wider font-semibold text-[10px]">
-                <th className="py-3 px-3 w-14">#No</th>
-                <th className="py-3 px-3">Item Details</th>
-                <th className="py-3 px-3">Category</th>
-                <th className="py-3 px-3">Diet</th>
-                <th className="py-3 px-3">Sizes & Rates (Click to Edit)</th>
-                <th className="py-3 px-3 text-right">Available</th>
+              <tr className="border-b border-[var(--border)] bg-[var(--surface-2)]/60 text-[var(--text-muted)] font-semibold text-[12px]">
+                <th className="py-3.5 px-4 w-14">#No</th>
+                <th className="py-3.5 px-4">Item Details</th>
+                <th className="py-3.5 px-4">Category</th>
+                <th className="py-3.5 px-4">Diet</th>
+                <th className="py-3.5 px-4">Sizes & Rates (Click to Edit)</th>
+                <th className="py-3.5 px-4 text-right">Available</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[var(--border-subtle)]">

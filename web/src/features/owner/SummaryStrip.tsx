@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { formatPaise } from '@ritsu/shared';
+import { BlockGauge } from '../../components/BlockGauge.js';
 
 interface SummaryData {
   period: 'today' | '7days' | 'all';
@@ -13,6 +14,9 @@ export const SummaryStrip: React.FC = () => {
   const [period, setPeriod] = useState<'today' | '7days' | 'all'>('today');
   const [summary, setSummary] = useState<SummaryData | null>(null);
   const [loading, setLoading] = useState(true);
+
+  // Daily target default ₹15,000 (1500000 paise)
+  const dailyTargetPaise = 1500000;
 
   const fetchSummary = async (p: 'today' | '7days' | 'all') => {
     setLoading(true);
@@ -33,78 +37,82 @@ export const SummaryStrip: React.FC = () => {
     fetchSummary(period);
   }, [period]);
 
+  const paidSales = summary?.totalSalesPaise || 0;
+  const targetPercent = Math.min(100, Math.round((paidSales / dailyTargetPaise) * 100));
+  const filledBlocks = Math.min(10, Math.max(0, Math.round((targetPercent / 100) * 10)));
+
   return (
-    <div className="bg-[var(--bg-card)] border border-[var(--border-default)] p-4 sm:p-5 mb-6 shadow-sm">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4 border-b border-[var(--border-subtle)] pb-3">
+    <div className="mb-6 space-y-4">
+      {/* Top Filter Bar */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div>
-          <h2 className="text-xs uppercase font-bold tracking-widest text-[var(--gold-ink)]">
-            Sales & Order Metrics
+          <h2 className="text-[18px] sm:text-[20px] font-bold text-[var(--text)]">
+            Sales overview
           </h2>
-          <p className="text-[11px] text-[var(--text-muted)] font-serif italic">
-            Calculated in Asia/Kolkata IST
+          <p className="text-[12px] text-[var(--text-muted)]">
+            Times calculated in Asia/Kolkata
           </p>
         </div>
 
         {/* Period Selector Tabs */}
-        <div className="inline-flex rounded border border-[var(--border-default)] p-0.5 bg-[var(--bg-canvas)]">
+        <div className="inline-flex rounded-full border border-[var(--border)] p-1 bg-[var(--surface-2)]">
           {(['today', '7days', 'all'] as const).map((p) => (
             <button
               key={p}
               onClick={() => setPeriod(p)}
-              className={`px-3 py-1 text-[11px] uppercase tracking-wider font-semibold transition-colors ${
+              className={`touch-target px-4 py-1.5 text-[13px] rounded-full font-medium transition-all ${
                 period === p
-                  ? 'bg-[var(--gold-ink)] text-[var(--bg-canvas)]'
-                  : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                  ? 'bg-[var(--surface)] text-[var(--text)] font-bold shadow-xs'
+                  : 'text-[var(--text-muted)] hover:text-[var(--text)]'
               }`}
             >
-              {p === 'today' ? 'Today' : p === '7days' ? '7 Days' : 'All Time'}
+              {p === 'today' ? 'Today' : p === '7days' ? '7 days' : 'All time'}
             </button>
           ))}
         </div>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 divide-y sm:divide-y-0 sm:divide-x divide-[var(--border-subtle)]">
-        {/* Metric 1: Total Paid Sales */}
-        <div className="pt-2 sm:pt-0 sm:px-3 first:px-0">
-          <div className="text-[10px] uppercase font-semibold tracking-wider text-[var(--text-secondary)]">
-            Paid Sales
+      {/* Grid: BlockGauge + 3 Summary Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        {/* BlockGauge for Paid Sales */}
+        <div className="md:col-span-2">
+          <BlockGauge
+            totalBlocks={10}
+            filledBlocks={filledBlocks}
+            bigValue={loading ? '—' : formatPaise(paidSales, false)}
+            peachCaption={`Paid sales · ${targetPercent}% of daily target (₹${dailyTargetPaise / 100})`}
+            mutedLabel="Target progress"
+          />
+        </div>
+
+        {/* Unpaid Orders Card */}
+        <div className="warm-card p-4 flex flex-col justify-between">
+          <div className="text-[12px] font-medium text-[var(--text-muted)]">
+            Unpaid orders
           </div>
-          <div className="font-serif text-xl sm:text-2xl font-bold text-[var(--text-primary)] mt-0.5 tabular-nums">
-            {loading ? '—' : formatPaise(summary?.totalSalesPaise || 0)}
+          <div className="text-[28px] sm:text-[32px] font-bold tabular-nums text-[var(--warning)] tracking-tight leading-tight my-1">
+            {loading ? '—' : formatPaise(summary?.unpaidPaise || 0, false)}
+          </div>
+          <div className="text-[12px] font-medium text-[var(--text-muted)]">
+            Pending at counter
           </div>
         </div>
 
-        {/* Metric 2: Unpaid Amount */}
-        <div className="pt-2 sm:pt-0 sm:px-3">
-          <div className="text-[10px] uppercase font-semibold tracking-wider text-[var(--text-secondary)]">
-            Unpaid Orders
+        {/* Orders & AOV Card */}
+        <div className="warm-card p-4 flex flex-col justify-between">
+          <div className="text-[12px] font-medium text-[var(--text-muted)]">
+            Order count & AOV
           </div>
-          <div className="font-serif text-xl sm:text-2xl font-bold text-amber-600 dark:text-amber-400 mt-0.5 tabular-nums">
-            {loading ? '—' : formatPaise(summary?.unpaidPaise || 0)}
+          <div className="text-[28px] sm:text-[32px] font-bold tabular-nums text-[var(--text)] tracking-tight leading-tight my-1">
+            {loading ? '—' : summary?.orderCount ?? 0}
           </div>
-        </div>
-
-        {/* Metric 3: Total Orders */}
-        <div className="pt-2 sm:pt-0 sm:px-3">
-          <div className="text-[10px] uppercase font-semibold tracking-wider text-[var(--text-secondary)]">
-            Order Count
-          </div>
-          <div className="font-serif text-xl sm:text-2xl font-bold text-[var(--text-primary)] mt-0.5 tabular-nums">
-            {loading ? '—' : (summary?.orderCount ?? 0)}
-          </div>
-        </div>
-
-        {/* Metric 4: Average Order Value */}
-        <div className="pt-2 sm:pt-0 sm:px-3">
-          <div className="text-[10px] uppercase font-semibold tracking-wider text-[var(--text-secondary)]">
-            Avg Order Value
-          </div>
-          <div className="font-serif text-xl sm:text-2xl font-bold text-[var(--text-primary)] mt-0.5 tabular-nums">
-            {loading ? '—' : formatPaise(summary?.averageOrderValuePaise || 0)}
+          <div className="text-[12px] font-semibold text-[var(--accent-ink)]">
+            Avg {loading ? '—' : formatPaise(summary?.averageOrderValuePaise || 0, false)}
           </div>
         </div>
       </div>
     </div>
   );
 };
+
 

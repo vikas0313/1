@@ -112,63 +112,63 @@ export const TablesPage: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* 1. Header & Actions */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[var(--border-default)] pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[var(--border)] pb-4">
         <div>
-          <h1 className="font-serif text-2xl font-bold text-[var(--text-primary)]">
-            Tables & QR Codes
+          <h1 className="text-[22px] sm:text-[24px] font-bold text-[var(--text)]">
+            Tables & QR codes
           </h1>
-          <p className="text-xs text-[var(--text-secondary)] font-serif italic">
-            Generate, copy, download, and print table QR codes for customer ordering.
+          <p className="text-[13px] text-[var(--text-muted)] mt-0.5">
+            Manage table QR codes for customer digital ordering.
           </p>
         </div>
 
         <div className="flex items-center gap-2">
           <Button
             variant="primary"
+            size="sm"
             onClick={handlePrintAllCards}
-            className="text-xs py-1.5 px-3 inline-flex items-center gap-1.5 tracking-wider font-semibold"
+            className="inline-flex items-center gap-1.5 font-semibold"
           >
-            <Printer className="w-3.5 h-3.5" />
-            <span>PRINT ALL QR CARDS</span>
+            <Printer className="w-4 h-4" />
+            <span>Print all QR cards</span>
           </Button>
         </div>
       </div>
 
       {/* 2. BASE_URL Warning Banner */}
       {isLocalUrl && (
-        <div className="p-4 bg-amber-500/10 border border-amber-500/30 text-amber-700 dark:text-amber-300 text-xs flex items-start gap-3 rounded">
+        <div className="p-4 bg-amber-500/10 border border-amber-500/30 text-[var(--warning)] text-[13px] flex items-start gap-3 rounded-2xl">
           <AlertTriangle className="w-5 h-5 shrink-0 text-amber-500 mt-0.5" />
           <div className="space-y-1">
-            <div className="font-bold uppercase tracking-wider">
-              Localhost / Private Network Warning
+            <div className="font-bold">
+              Localhost or private network warning
             </div>
-            <p>
-              Your active base URL is currently set to <code className="font-mono px-1 py-0.5 bg-black/10 rounded">{baseUrl}</code>.
-              Customers scanning this QR code on mobile data or other Wi-Fi networks will NOT be able to connect.
-              For live dining, provide your public HTTPS domain (e.g. ngrok, Cloudflare Tunnel, or Render URL).
+            <p className="text-[12px] leading-relaxed">
+              Your active base URL is set to <code className="font-mono px-1.5 py-0.5 bg-black/10 rounded-full">{baseUrl}</code>.
+              Customers scanning this code from mobile data cannot connect unless a public domain or tunnel is configured.
             </p>
           </div>
         </div>
       )}
 
       {/* 3. Add Table Inline Form */}
-      <div className="bg-[var(--bg-card)] border border-[var(--border-default)] p-4 flex flex-wrap items-center justify-between gap-4">
+      <div className="warm-card p-4 flex flex-wrap items-center justify-between gap-4">
         <form onSubmit={handleAddTable} className="flex items-center gap-2 flex-1 max-w-sm">
           <input
             type="text"
             value={newTableLabel}
             onChange={(e) => setNewTableLabel(e.target.value)}
-            placeholder="New Table Label (e.g. T9, Garden 1)"
-            className="flex-1 px-3 py-1.5 text-xs bg-[var(--bg-canvas)] border border-[var(--border-default)] rounded text-[var(--text-primary)] focus:outline-none focus:border-[var(--gold-ink)]"
+            placeholder="New table label (e.g. T9)"
+            className="touch-target flex-1 px-4 h-11 text-[13px] bg-[var(--surface-2)] border border-[var(--border)] rounded-full text-[var(--text)] focus:outline-none focus:border-[var(--accent)] focus:bg-[var(--surface)] transition-all"
           />
-          <Button type="submit" variant="secondary" className="py-1.5 px-3 text-xs inline-flex items-center gap-1">
+          <Button type="submit" variant="secondary" size="sm" className="inline-flex items-center gap-1">
             <Plus className="w-3.5 h-3.5" />
-            Add Table
+            <span>Add</span>
           </Button>
         </form>
 
-        <div className="text-xs text-[var(--text-muted)] font-serif italic">
-          Active tables: {tables.filter((t) => t.active).length} of {tables.length}
+        <div className="text-[13px] text-[var(--text-muted)] font-medium">
+          Active tables: <span className="font-bold text-[var(--text)]">{tables.filter((t) => t.active).length}</span> of {tables.length}
         </div>
       </div>
 
@@ -176,7 +176,7 @@ export const TablesPage: React.FC = () => {
       {loading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {[1, 2, 3, 4].map((i) => (
-            <Skeleton key={i} className="h-64 w-full" />
+            <Skeleton key={i} className="h-64 w-full rounded-[24px]" />
           ))}
         </div>
       ) : (

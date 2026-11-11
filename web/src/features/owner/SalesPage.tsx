@@ -77,12 +77,12 @@ export const SalesPage: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* 1. Header & Backup Action */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[var(--border-default)] pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[var(--border)] pb-4">
         <div>
-          <h1 className="font-serif text-2xl font-bold text-[var(--text-primary)]">
-            Sales & Financial Reports
+          <h1 className="text-[22px] sm:text-[24px] font-bold text-[var(--text)]">
+            Sales & reports
           </h1>
-          <p className="text-xs text-[var(--text-secondary)] font-serif italic">
+          <p className="text-[13px] text-[var(--text-muted)] mt-0.5">
             Daily revenue breakdowns, transaction totals, and database backup.
           </p>
         </div>
@@ -90,41 +90,42 @@ export const SalesPage: React.FC = () => {
         <div className="flex items-center gap-2">
           <Button
             variant="primary"
+            size="sm"
             onClick={handleDownloadBackup}
-            className="text-xs py-1.5 px-3 inline-flex items-center gap-1.5 tracking-wider font-semibold"
+            className="inline-flex items-center gap-1.5 font-semibold"
           >
-            <ArrowDownToLine className="w-3.5 h-3.5" />
-            <span>DOWNLOAD BACKUP (.DB)</span>
+            <ArrowDownToLine className="w-4 h-4" />
+            <span>Download backup (.db)</span>
           </Button>
         </div>
       </div>
 
       {/* 2. Highlights Strip */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-[var(--bg-card)] border border-[var(--border-default)] p-4">
-          <div className="text-[10px] uppercase font-semibold tracking-wider text-[var(--text-secondary)]">
-            All-Time Paid Revenue
+        <div className="warm-card p-5">
+          <div className="text-[12px] font-medium text-[var(--text-muted)]">
+            All-time paid revenue
           </div>
-          <div className="font-serif text-2xl font-bold text-[var(--gold-ink)] mt-1">
-            {formatPaise(totalSalesPaise)}
+          <div className="text-[28px] sm:text-[32px] font-bold tabular-nums text-[var(--accent-ink)] mt-1">
+            {formatPaise(totalSalesPaise, false)}
           </div>
         </div>
 
-        <div className="bg-[var(--bg-card)] border border-[var(--border-default)] p-4">
-          <div className="text-[10px] uppercase font-semibold tracking-wider text-[var(--text-secondary)]">
-            Total Orders Processed
+        <div className="warm-card p-5">
+          <div className="text-[12px] font-medium text-[var(--text-muted)]">
+            Total orders processed
           </div>
-          <div className="font-serif text-2xl font-bold text-[var(--text-primary)] mt-1">
+          <div className="text-[28px] sm:text-[32px] font-bold tabular-nums text-[var(--text)] mt-1">
             {totalOrders}
           </div>
         </div>
 
-        <div className="bg-[var(--bg-card)] border border-[var(--border-default)] p-4">
-          <div className="text-[10px] uppercase font-semibold tracking-wider text-[var(--text-secondary)]">
-            Average Order Value
+        <div className="warm-card p-5">
+          <div className="text-[12px] font-medium text-[var(--text-muted)]">
+            Average order value
           </div>
-          <div className="font-serif text-2xl font-bold text-[var(--text-primary)] mt-1">
-            {totalOrders > 0 ? formatPaise(Math.round(totalSalesPaise / totalOrders)) : '₹0.00'}
+          <div className="text-[28px] sm:text-[32px] font-bold tabular-nums text-[var(--text)] mt-1">
+            {totalOrders > 0 ? formatPaise(Math.round(totalSalesPaise / totalOrders), false) : '₹0'}
           </div>
         </div>
       </div>
@@ -132,27 +133,27 @@ export const SalesPage: React.FC = () => {
       {/* 3. Daily Breakdown Table */}
       {loading ? (
         <div className="space-y-3">
-          <Skeleton className="h-10 w-full" />
-          <Skeleton className="h-14 w-full" />
-          <Skeleton className="h-14 w-full" />
+          <Skeleton className="h-12 w-full rounded-2xl" />
+          <Skeleton className="h-14 w-full rounded-2xl" />
+          <Skeleton className="h-14 w-full rounded-2xl" />
         </div>
       ) : (
-        <div className="bg-[var(--bg-card)] border border-[var(--border-default)] overflow-x-auto shadow-xs">
-          <table className="w-full text-left text-xs border-collapse">
+        <div className="warm-card overflow-hidden shadow-xs">
+          <table className="w-full text-left text-[13px] border-collapse">
             <thead>
-              <tr className="border-b border-[var(--border-default)] bg-[var(--bg-surface)] text-[var(--text-secondary)] uppercase tracking-wider font-semibold text-[10px]">
-                <th className="py-3 px-4">Date</th>
-                <th className="py-3 px-4">Paid Orders</th>
-                <th className="py-3 px-4">Paid Revenue</th>
-                <th className="py-3 px-4">Unpaid Orders</th>
-                <th className="py-3 px-4">Unpaid Amount</th>
-                <th className="py-3 px-4 text-right">Day Average</th>
+              <tr className="border-b border-[var(--border)] bg-[var(--surface-2)]/60 text-[var(--text-muted)] font-semibold text-[12px]">
+                <th className="py-3.5 px-4">Date</th>
+                <th className="py-3.5 px-4">Paid Orders</th>
+                <th className="py-3.5 px-4">Paid Revenue</th>
+                <th className="py-3.5 px-4">Unpaid Orders</th>
+                <th className="py-3.5 px-4">Unpaid Amount</th>
+                <th className="py-3.5 px-4 text-right">Day Average</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[var(--border-subtle)]">
+            <tbody className="divide-y divide-[var(--border)]/50">
               {dailyData.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="text-center py-8 text-xs text-[var(--text-muted)] italic font-serif">
+                  <td colSpan={6} className="text-center py-12 text-[13px] text-[var(--text-muted)] italic">
                     No orders recorded yet.
                   </td>
                 </tr>
@@ -162,24 +163,24 @@ export const SalesPage: React.FC = () => {
                   const totalDayPaise = day.paidRevenuePaise + day.unpaidRevenuePaise;
                   const avgPaise = totalDayOrders > 0 ? Math.round(totalDayPaise / totalDayOrders) : 0;
                   return (
-                    <tr key={day.date} className="hover:bg-[var(--bg-surface)] transition-colors">
-                      <td className="py-3 px-4 font-mono font-bold text-[var(--text-primary)]">
+                    <tr key={day.date} className="hover:bg-[var(--surface-2)]/40 transition-colors">
+                      <td className="py-3.5 px-4 font-medium text-[var(--text)]">
                         {day.date}
                       </td>
-                      <td className="py-3 px-4 font-mono text-emerald-600 dark:text-emerald-400 font-semibold">
+                      <td className="py-3.5 px-4 tabular-nums text-[var(--success)] font-semibold">
                         {day.paidOrders}
                       </td>
-                      <td className="py-3 px-4 font-serif font-bold text-[var(--gold-ink)]">
-                        {formatPaise(day.paidRevenuePaise)}
+                      <td className="py-3.5 px-4 tabular-nums font-bold text-[var(--accent-ink)]">
+                        {formatPaise(day.paidRevenuePaise, false)}
                       </td>
-                      <td className="py-3 px-4 font-mono text-amber-600 dark:text-amber-400 font-semibold">
+                      <td className="py-3.5 px-4 tabular-nums text-[var(--warning)] font-semibold">
                         {day.unpaidOrders}
                       </td>
-                      <td className="py-3 px-4 font-serif text-[var(--text-secondary)]">
-                        {formatPaise(day.unpaidRevenuePaise)}
+                      <td className="py-3.5 px-4 tabular-nums text-[var(--text-muted)]">
+                        {formatPaise(day.unpaidRevenuePaise, false)}
                       </td>
-                      <td className="py-3 px-4 text-right font-serif font-bold text-[var(--text-primary)]">
-                        {formatPaise(avgPaise)}
+                      <td className="py-3.5 px-4 text-right tabular-nums font-bold text-[var(--text)]">
+                        {formatPaise(avgPaise, false)}
                       </td>
                     </tr>
                   );

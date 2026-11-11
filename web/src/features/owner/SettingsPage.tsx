@@ -97,107 +97,107 @@ export const SettingsPage: React.FC = () => {
   return (
     <div className="max-w-4xl space-y-8">
       {/* 1. Header */}
-      <div className="border-b border-[var(--border-default)] pb-4">
-        <h1 className="font-serif text-2xl font-bold text-[var(--text-primary)]">
-          Restaurant Settings
+      <div className="border-b border-[var(--border)] pb-4">
+        <h1 className="text-[22px] sm:text-[24px] font-bold text-[var(--text)]">
+          Restaurant settings
         </h1>
-        <p className="text-xs text-[var(--text-secondary)] font-serif italic">
-          Configure profile details, UPI payments, audio announcements, and administrative credentials.
+        <p className="text-[13px] text-[var(--text-muted)] mt-0.5">
+          Configure profile details, UPI payments, audio announcements, theme, and security.
         </p>
       </div>
 
       {/* 2. Restaurant Profile & Billing Details Form */}
-      <div className="bg-[var(--bg-card)] border border-[var(--border-default)] p-6 shadow-xs">
-        <div className="flex items-center gap-2 mb-4 border-b border-[var(--border-subtle)] pb-3">
-          <Building2 className="w-4 h-4 text-[var(--gold-ink)]" />
-          <h2 className="font-serif text-base font-bold text-[var(--text-primary)]">
-            Restaurant Details & Bill Header
+      <div className="warm-card p-6 shadow-xs">
+        <div className="flex items-center gap-2.5 mb-5 border-b border-[var(--border)] pb-3">
+          <Building2 className="w-5 h-5 text-[var(--accent-ink)]" />
+          <h2 className="text-[16px] font-bold text-[var(--text)]">
+            Restaurant details and bill header
           </h2>
         </div>
 
-        <form onSubmit={handleSaveProfile} className="space-y-4 text-xs">
+        <form onSubmit={handleSaveProfile} className="space-y-4 text-[13px]">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block uppercase font-semibold text-[var(--text-secondary)] mb-1 text-[11px]">
-                Restaurant Name
+              <label className="block font-semibold text-[var(--text)] mb-1.5 text-[12px]">
+                Restaurant name
               </label>
               <input
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full px-3 py-2 bg-[var(--bg-canvas)] border border-[var(--border-default)] rounded text-[var(--text-primary)] focus:outline-none focus:border-[var(--gold-ink)]"
+                className="touch-target w-full px-4 h-11 bg-[var(--surface-2)] border border-[var(--border)] rounded-full text-[var(--text)] focus:outline-none focus:border-[var(--accent)] focus:bg-[var(--surface)] transition-all"
                 required
               />
             </div>
 
             <div>
-              <label className="block uppercase font-semibold text-[var(--text-secondary)] mb-1 text-[11px]">
+              <label className="block font-semibold text-[var(--text)] mb-1.5 text-[12px]">
                 Tagline
               </label>
               <input
                 type="text"
                 value={tagline}
                 onChange={(e) => setTagline(e.target.value)}
-                className="w-full px-3 py-2 bg-[var(--bg-canvas)] border border-[var(--border-default)] rounded text-[var(--text-primary)] focus:outline-none focus:border-[var(--gold-ink)]"
+                className="touch-target w-full px-4 h-11 bg-[var(--surface-2)] border border-[var(--border)] rounded-full text-[var(--text)] focus:outline-none focus:border-[var(--accent)] focus:bg-[var(--surface)] transition-all"
               />
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block uppercase font-semibold text-[var(--text-secondary)] mb-1 text-[11px]">
-                Contact Phone (Shown on party orders link)
+              <label className="block font-semibold text-[var(--text)] mb-1.5 text-[12px]">
+                Contact phone (party orders link)
               </label>
               <input
                 type="text"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                className="w-full px-3 py-2 bg-[var(--bg-canvas)] border border-[var(--border-default)] rounded text-[var(--text-primary)] focus:outline-none focus:border-[var(--gold-ink)]"
+                className="touch-target w-full px-4 h-11 bg-[var(--surface-2)] border border-[var(--border)] rounded-full text-[var(--text)] focus:outline-none focus:border-[var(--accent)] focus:bg-[var(--surface)] transition-all"
                 required
               />
             </div>
 
             <div>
-              <label className="block uppercase font-semibold text-[var(--text-secondary)] mb-1 text-[11px]">
+              <label className="block font-semibold text-[var(--text)] mb-1.5 text-[12px]">
                 GSTIN / Tax ID (Printed on receipts)
               </label>
               <input
                 type="text"
                 value={gstin}
                 onChange={(e) => setGstin(e.target.value)}
-                className="w-full px-3 py-2 bg-[var(--bg-canvas)] border border-[var(--border-default)] rounded text-[var(--text-primary)] focus:outline-none focus:border-[var(--gold-ink)]"
+                className="touch-target w-full px-4 h-11 bg-[var(--surface-2)] border border-[var(--border)] rounded-full text-[var(--text)] focus:outline-none focus:border-[var(--accent)] focus:bg-[var(--surface)] transition-all"
               />
             </div>
           </div>
 
           <div>
-            <label className="block uppercase font-semibold text-[var(--text-secondary)] mb-1 text-[11px]">
-              Restaurant Address (Printed on receipts)
+            <label className="block font-semibold text-[var(--text)] mb-1.5 text-[12px]">
+              Restaurant address (Printed on receipts)
             </label>
             <input
               type="text"
               value={address}
               onChange={(e) => setAddress(e.target.value)}
-              className="w-full px-3 py-2 bg-[var(--bg-canvas)] border border-[var(--border-default)] rounded text-[var(--text-primary)] focus:outline-none focus:border-[var(--gold-ink)]"
+              className="touch-target w-full px-4 h-11 bg-[var(--surface-2)] border border-[var(--border)] rounded-full text-[var(--text)] focus:outline-none focus:border-[var(--accent)] focus:bg-[var(--surface)] transition-all"
             />
           </div>
 
           <div>
-            <label className="block uppercase font-semibold text-[var(--text-secondary)] mb-1 text-[11px]">
-              UPI VPA for QR Payments
+            <label className="block font-semibold text-[var(--text)] mb-1.5 text-[12px]">
+              UPI VPA for QR payments
             </label>
             <div className="flex items-center gap-2 max-w-sm">
               <input
                 type={showVpa ? 'text' : 'password'}
                 value={upiVpa}
                 onChange={(e) => setUpiVpa(e.target.value)}
-                className="flex-1 px-3 py-2 bg-[var(--bg-canvas)] border border-[var(--border-default)] rounded text-[var(--text-primary)] font-mono focus:outline-none focus:border-[var(--gold-ink)]"
+                className="touch-target flex-1 px-4 h-11 bg-[var(--surface-2)] border border-[var(--border)] rounded-full text-[var(--text)] font-mono focus:outline-none focus:border-[var(--accent)] focus:bg-[var(--surface)] transition-all"
                 required
               />
               <button
                 type="button"
                 onClick={() => setShowVpa(!showVpa)}
-                className="p-2 border border-[var(--border-default)] rounded text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+                className="touch-target w-11 h-11 rounded-full border border-[var(--border)] flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text)] transition-colors"
                 title={showVpa ? 'Mask VPA' : 'Show VPA'}
               >
                 {showVpa ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -209,16 +209,17 @@ export const SettingsPage: React.FC = () => {
             <Button
               type="submit"
               variant="primary"
-              loading={savingProfile}
-              className="py-2 px-4 text-xs font-semibold tracking-wider uppercase inline-flex items-center gap-1.5"
+              size="md"
+              isLoading={savingProfile}
+              className="font-semibold inline-flex items-center gap-1.5"
             >
-              <Save className="w-3.5 h-3.5" />
-              <span>Save Profile</span>
+              <Save className="w-4 h-4" />
+              <span>Save profile</span>
             </Button>
             {profileSaved && (
-              <span className="text-emerald-600 dark:text-emerald-400 font-semibold inline-flex items-center gap-1">
-                <Check className="w-3.5 h-3.5" />
-                Saved successfully!
+              <span className="text-[var(--success)] font-semibold inline-flex items-center gap-1 text-[13px]">
+                <Check className="w-4 h-4" />
+                Saved successfully
               </span>
             )}
           </div>
@@ -226,44 +227,46 @@ export const SettingsPage: React.FC = () => {
       </div>
 
       {/* 3. Audio & Spoken Alerts Settings */}
-      <div className="bg-[var(--bg-card)] border border-[var(--border-default)] p-6 shadow-xs">
-        <div className="flex items-center justify-between mb-4 border-b border-[var(--border-subtle)] pb-3">
-          <div className="flex items-center gap-2">
-            <Volume2 className="w-4 h-4 text-[var(--gold-ink)]" />
-            <h2 className="font-serif text-base font-bold text-[var(--text-primary)]">
-              Kitchen Spoken Alert Settings
+      <div className="warm-card p-6 shadow-xs">
+        <div className="flex items-center justify-between mb-5 border-b border-[var(--border)] pb-3">
+          <div className="flex items-center gap-2.5">
+            <Volume2 className="w-5 h-5 text-[var(--accent-ink)]" />
+            <h2 className="text-[16px] font-bold text-[var(--text)]">
+              Kitchen spoken alert settings
             </h2>
           </div>
           <button
             onClick={handleTestAlert}
-            className="px-2.5 py-1 text-xs border border-[var(--border-default)] rounded hover:border-[var(--gold-ink)] hover:text-[var(--gold-ink)] transition-colors"
+            className="touch-target px-4 h-10 text-[12px] font-medium border border-[var(--border)] rounded-full hover:border-[var(--accent)] hover:text-[var(--accent-ink)] transition-colors"
           >
-            Test Alert Sound
+            Test alert sound
           </button>
         </div>
 
-        <div className="space-y-4 text-xs">
-          <div className="flex items-center justify-between py-2 border-b border-[var(--border-subtle)]">
+        <div className="space-y-4 text-[13px]">
+          <div className="flex items-center justify-between py-2 border-b border-[var(--border)]/50">
             <div>
-              <div className="font-semibold text-[var(--text-primary)]">Mute Alerts</div>
-              <div className="text-[11px] text-[var(--text-muted)]">
+              <div className="font-semibold text-[var(--text)]">Mute alerts</div>
+              <div className="text-[12px] text-[var(--text-muted)]">
                 Silence speech and tone alerts when not on kitchen duty.
               </div>
             </div>
             <button
               onClick={() => handleSoundSettingChange({ muted: !soundSettings.muted })}
-              className={`px-3 py-1 rounded font-semibold uppercase ${
-                soundSettings.muted ? 'bg-red-500/10 text-red-600' : 'bg-emerald-500/10 text-emerald-600'
+              className={`touch-target px-3.5 py-1.5 rounded-full font-semibold text-[12px] transition-all ${
+                soundSettings.muted
+                  ? 'bg-red-50 text-[var(--danger)] border border-red-200 dark:bg-red-950/40'
+                  : 'bg-emerald-50 text-[var(--success)] border border-emerald-200 dark:bg-emerald-950/40'
               }`}
             >
               {soundSettings.muted ? 'Muted' : 'Audible'}
             </button>
           </div>
 
-          <div className="flex items-center justify-between py-2 border-b border-[var(--border-subtle)]">
+          <div className="flex items-center justify-between py-2 border-b border-[var(--border)]/50">
             <div>
-              <div className="font-semibold text-[var(--text-primary)]">Volume ({Math.round(soundSettings.volume * 100)}%)</div>
-              <div className="text-[11px] text-[var(--text-muted)]">
+              <div className="font-semibold text-[var(--text)]">Volume ({Math.round(soundSettings.volume * 100)}%)</div>
+              <div className="text-[12px] text-[var(--text-muted)]">
                 Output volume for speech synthesis and attention tone.
               </div>
             </div>
@@ -274,24 +277,24 @@ export const SettingsPage: React.FC = () => {
               step="0.05"
               value={soundSettings.volume}
               onChange={(e) => handleSoundSettingChange({ volume: parseFloat(e.target.value) })}
-              className="w-32 accent-[var(--gold-ink)]"
+              className="w-32 accent-[var(--accent)]"
             />
           </div>
 
           {voices.length > 0 && (
-            <div className="flex items-center justify-between py-2 border-b border-[var(--border-subtle)]">
+            <div className="flex items-center justify-between py-2 border-b border-[var(--border)]/50">
               <div>
-                <div className="font-semibold text-[var(--text-primary)]">Voice Accent</div>
-                <div className="text-[11px] text-[var(--text-muted)]">
-                  Preferred SpeechSynthesis voice profile.
+                <div className="font-semibold text-[var(--text)]">Voice accent</div>
+                <div className="text-[12px] text-[var(--text-muted)]">
+                  Speech synthesis voice profile.
                 </div>
               </div>
               <select
                 value={soundSettings.voiceURI || ''}
                 onChange={(e) => handleSoundSettingChange({ voiceURI: e.target.value || undefined })}
-                className="text-xs bg-[var(--bg-canvas)] border border-[var(--border-default)] rounded px-2.5 py-1 text-[var(--text-primary)] max-w-xs"
+                className="touch-target text-[12px] bg-[var(--surface-2)] border border-[var(--border)] rounded-full px-3 py-1.5 text-[var(--text)] max-w-xs focus:outline-none focus:border-[var(--accent)]"
               >
-                <option value="">Browser Default Voice</option>
+                <option value="">Browser default voice</option>
                 {voices.map((v) => (
                   <option key={v.voiceURI} value={v.voiceURI}>
                     {v.name} ({v.lang})
@@ -303,8 +306,8 @@ export const SettingsPage: React.FC = () => {
 
           <div className="flex items-center justify-between py-2">
             <div>
-              <div className="font-semibold text-[var(--text-primary)]">Repeat Unhandled Orders</div>
-              <div className="text-[11px] text-[var(--text-muted)]">
+              <div className="font-semibold text-[var(--text)]">Repeat unhandled orders</div>
+              <div className="text-[12px] text-[var(--text-muted)]">
                 Repeat reminder tone and speech every 30 seconds until the order is accepted.
               </div>
             </div>
@@ -314,10 +317,10 @@ export const SettingsPage: React.FC = () => {
                   repeatIntervalSeconds: soundSettings.repeatIntervalSeconds === 0 ? 30 : 0,
                 })
               }
-              className={`px-3 py-1 rounded font-semibold uppercase ${
+              className={`touch-target px-3.5 py-1.5 rounded-full font-semibold text-[12px] transition-all ${
                 soundSettings.repeatIntervalSeconds > 0
-                  ? 'bg-[var(--gold-ink)] text-[var(--bg-canvas)]'
-                  : 'bg-zinc-500/10 text-zinc-500'
+                  ? 'bg-[var(--accent)] text-[var(--on-accent)]'
+                  : 'bg-[var(--surface-2)] text-[var(--text-muted)] border border-[var(--border)]'
               }`}
             >
               {soundSettings.repeatIntervalSeconds > 0 ? 'Every 30s' : 'Off'}
@@ -327,22 +330,22 @@ export const SettingsPage: React.FC = () => {
       </div>
 
       {/* 4. Security & Password Guide */}
-      <div className="bg-[var(--bg-card)] border border-[var(--border-default)] p-6 shadow-xs">
-        <div className="flex items-center gap-2 mb-3 border-b border-[var(--border-subtle)] pb-3">
-          <ShieldCheck className="w-4 h-4 text-emerald-500" />
-          <h2 className="font-serif text-base font-bold text-[var(--text-primary)]">
-            Security & Owner Password
+      <div className="warm-card p-6 shadow-xs">
+        <div className="flex items-center gap-2.5 mb-4 border-b border-[var(--border)] pb-3">
+          <ShieldCheck className="w-5 h-5 text-[var(--success)]" />
+          <h2 className="text-[16px] font-bold text-[var(--text)]">
+            Security & owner password
           </h2>
         </div>
 
-        <p className="text-xs text-[var(--text-secondary)] mb-4">
-          The owner password is protected using salted bcrypt hash in your environment variable <code className="font-mono font-bold">OWNER_PASSWORD_HASH</code>.
+        <p className="text-[13px] text-[var(--text-muted)] mb-4 leading-relaxed">
+          The owner password is protected using salted bcrypt hash in your environment variable <code className="font-mono font-bold bg-[var(--surface-2)] px-1.5 py-0.5 rounded-full">OWNER_PASSWORD_HASH</code>.
           To update your master owner password at any time, run the bundled CLI script in your terminal:
         </p>
 
-        <div className="p-3 bg-[var(--bg-canvas)] border border-[var(--border-default)] rounded font-mono text-xs flex items-center justify-between">
+        <div className="p-3.5 bg-[var(--surface-2)] border border-[var(--border)] rounded-2xl font-mono text-[13px] flex items-center justify-between">
           <span>npm run hash-password -- "YourNewSecretPassword"</span>
-          <Terminal className="w-4 h-4 text-[var(--gold-ink)]" />
+          <Terminal className="w-4 h-4 text-[var(--accent-ink)]" />
         </div>
       </div>
     </div>

@@ -68,36 +68,36 @@ export const OwnerLoginPage: React.FC<OwnerLoginPageProps> = ({ onLoginSuccess }
         </div>
       )}
 
-      <div className="w-full max-w-sm bg-[var(--bg-card)] border border-[var(--border-default)] p-6 sm:p-8 shadow-xl">
+      <div className="w-full max-w-sm warm-card p-6 sm:p-8 shadow-xl">
         <div className="text-center mb-6">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[var(--gold-ink)]/10 text-[var(--gold-ink)] mb-3 border border-[var(--gold-ink)]/20">
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-[var(--accent)]/15 text-[var(--accent-ink)] mb-3 border border-[var(--accent)]/30">
             <Lock className="w-6 h-6" />
           </div>
-          <h1 className="font-serif text-2xl font-bold tracking-tight text-[var(--text-primary)]">
-            Owner Portal
+          <h1 className="text-[22px] sm:text-[24px] font-bold tracking-tight text-[var(--text)]">
+            Owner portal
           </h1>
-          <p className="font-serif text-xs italic text-[var(--text-secondary)] mt-1">
-            Ritsu Food Corner · Kitchen & Management
+          <p className="text-[13px] text-[var(--text-muted)] mt-1">
+            Ritsu Food Corner · Kitchen and operations
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)] mb-1.5">
-              Owner Password
+            <label className="block text-[13px] font-semibold text-[var(--text)] mb-2">
+              Password
             </label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter password"
+              placeholder="Enter owner password"
               autoComplete="off"
-              className="w-full px-3 py-2.5 text-sm bg-[var(--bg-canvas)] border border-[var(--border-default)] text-[var(--text-primary)] focus:outline-none focus:border-[var(--gold-ink)] focus:ring-1 focus:ring-[var(--gold-ink)] transition-colors"
+              className="touch-target w-full px-4 h-12 text-[14px] bg-[var(--surface-2)] border border-[var(--border)] rounded-full text-[var(--text)] focus:outline-none focus:border-[var(--accent)] focus:bg-[var(--surface)] transition-all"
             />
           </div>
 
           {error && (
-            <div className="p-3 bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 text-xs font-medium">
+            <div className="p-3 bg-red-500/10 border border-red-500/20 text-[var(--danger)] rounded-xl text-[13px] font-medium">
               {error}
             </div>
           )}
@@ -105,14 +105,15 @@ export const OwnerLoginPage: React.FC<OwnerLoginPageProps> = ({ onLoginSuccess }
           <Button
             type="submit"
             variant="primary"
-            loading={loading}
-            className="w-full py-2.5 tracking-wider font-semibold"
+            size="lg"
+            isLoading={loading}
+            className="w-full font-semibold"
           >
-            SIGN IN
+            Sign in
           </Button>
         </form>
 
-        <div className="mt-6 pt-4 border-t border-[var(--border-subtle)] text-center text-xs text-[var(--text-muted)]">
+        <div className="mt-6 pt-4 border-t border-[var(--border)] text-center text-[12px] text-[var(--text-muted)]">
           Protected portal for restaurant administration.
         </div>
       </div>
