@@ -4,6 +4,7 @@ import { SummaryStrip } from './SummaryStrip.js';
 import { OrderCard } from './OrderCard.js';
 import { alertService } from '../../services/AlertService.js';
 import { Skeleton } from '../../components/Skeleton.js';
+import { useOwnerOrdersSafe } from '../../context/OwnerOrdersContext.js';
 import { Search, Filter, RefreshCw } from 'lucide-react';
 
 interface OrdersPageProps {
@@ -15,33 +16,50 @@ export const OrdersPage: React.FC<OrdersPageProps> = ({
   onOrdersCountChange,
   onSseStatusChange,
 }) => {
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [loading, setLoading] = useState(true);
+  const context = useOwnerOrdersSafe();
+
+  const [localOrders, setLocalOrders] = useState<Order[]>([]);
+  const [localLoading, setLocalLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [tableFilter, setTableFilter] = useState('');
   const [paymentFilter, setPaymentFilter] = useState<'all' | 'paid' | 'unpaid'>('all');
 
-  // Fetch initial orders
+  const orders = context ? context.orders : localOrders;
+  const loading = context ? context.loading : localLoading;
+
+  // Propagate counts/status from context to parent props if provided
+  useEffect(() => {
+    if (context) {
+      if (onOrdersCountChange) onOrdersCountChange(context.pendingOrdersCount);
+      if (onSseStatusChange) onSseStatusChange(context.sseStatus);
+    }
+  }, [context?.pendingOrdersCount, context?.sseStatus, onOrdersCountChange, onSseStatusChange]);
+
+  // Fallback fetch if rendered without OwnerOrdersProvider
   const fetchOrders = async () => {
+    if (context) {
+      return context.fetchOrders();
+    }
     try {
       const res = await fetch('/api/owner/orders');
       if (res.ok) {
         const data: Order[] = await res.json();
-        setOrders(data);
+        setLocalOrders(data);
         const pendingCount = data.filter((o) => o.status === 'pending').length;
         if (onOrdersCountChange) onOrdersCountChange(pendingCount);
       }
     } catch {
       // ignore
     } finally {
-      setLoading(false);
+      setLocalLoading(false);
     }
   };
 
   useEffect(() => {
+    if (context) return; // Managed by OwnerOrdersProvider
+
     fetchOrders();
 
-    // 1. Establish SSE stream with /api/owner/live
     let eventSource: EventSource | null = null;
     let pollInterval: any = null;
 
@@ -56,8 +74,7 @@ export const OrdersPage: React.FC<OrdersPageProps> = ({
         eventSource.addEventListener('order.created', (event: any) => {
           try {
             const newOrder: Order = JSON.parse(event.data);
-            setOrders((prev) => {
-              // Deduplicate if already present
+            setLocalOrders((prev) => {
               const filtered = prev.filter((o) => o.id !== newOrder.id);
               const updated = [newOrder, ...filtered];
               const pendingCount = updated.filter((o) => o.status === 'pending').length;
@@ -65,16 +82,14 @@ export const OrdersPage: React.FC<OrdersPageProps> = ({
               return updated;
             });
 
-            // Trigger spoken alert system
+            // Trigger spoken alert system: "New order. Table {n}."
             alertService.enqueue({
               id: newOrder.id,
               table_label: newOrder.table_label,
             });
 
-            // Update page title badge
             document.title = `(!) New Order - Table ${newOrder.table_label}`;
 
-            // Browser push notification if permitted
             if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') {
               new Notification('New Order Received', {
                 body: `Table ${newOrder.table_label}: ${newOrder.items.length} items by ${newOrder.customer_name}`,
@@ -89,7 +104,7 @@ export const OrdersPage: React.FC<OrdersPageProps> = ({
         eventSource.addEventListener('order.updated', (event: any) => {
           try {
             const updatedOrder: Order = JSON.parse(event.data);
-            setOrders((prev) => {
+            setLocalOrders((prev) => {
               const updated = prev.map((o) => (o.id === updatedOrder.id ? updatedOrder : o));
               const pendingCount = updated.filter((o) => o.status === 'pending').length;
               if (onOrdersCountChange) onOrdersCountChange(pendingCount);
@@ -107,7 +122,6 @@ export const OrdersPage: React.FC<OrdersPageProps> = ({
             eventSource.close();
             eventSource = null;
           }
-          // Retry after 4 seconds
           setTimeout(connectSSE, 4000);
         };
       } catch (err) {
@@ -116,19 +130,19 @@ export const OrdersPage: React.FC<OrdersPageProps> = ({
     };
 
     connectSSE();
-
-    // 2. Fallback polling every 8 seconds in case SSE drops
     pollInterval = setInterval(fetchOrders, 8000);
 
     return () => {
       if (eventSource) eventSource.close();
       if (pollInterval) clearInterval(pollInterval);
     };
-  }, []);
+  }, [context]);
 
   const handleAdvanceStatus = async (orderId: string, nextStatus: OrderStatus) => {
-    // Optimistic update
-    setOrders((prev) =>
+    if (context) {
+      return context.advanceStatus(orderId, nextStatus);
+    }
+    setLocalOrders((prev) =>
       prev.map((o) => (o.id === orderId ? { ...o, status: nextStatus } : o))
     );
     alertService.markOrderAdvanced(orderId);
@@ -139,17 +153,17 @@ export const OrdersPage: React.FC<OrdersPageProps> = ({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: nextStatus }),
       });
-      if (!res.ok) {
-        // Rollback on failure
-        fetchOrders();
-      }
+      if (!res.ok) fetchOrders();
     } catch {
       fetchOrders();
     }
   };
 
   const handleMarkPaid = async (orderId: string, method: 'cash' | 'upi_manual') => {
-    setOrders((prev) =>
+    if (context) {
+      return context.markPaid(orderId, method);
+    }
+    setLocalOrders((prev) =>
       prev.map((o) =>
         o.id === orderId
           ? { ...o, payment_status: 'paid', payment_method: method }
@@ -170,7 +184,10 @@ export const OrdersPage: React.FC<OrdersPageProps> = ({
   };
 
   const handleMarkRefunded = async (orderId: string) => {
-    setOrders((prev) =>
+    if (context) {
+      return context.markRefunded(orderId);
+    }
+    setLocalOrders((prev) =>
       prev.map((o) =>
         o.id === orderId ? { ...o, payment_status: 'refunded' } : o
       )
@@ -187,7 +204,10 @@ export const OrdersPage: React.FC<OrdersPageProps> = ({
   };
 
   const handleCancelOrder = async (orderId: string) => {
-    setOrders((prev) => prev.filter((o) => o.id !== orderId));
+    if (context) {
+      return context.cancelOrder(orderId);
+    }
+    setLocalOrders((prev) => prev.filter((o) => o.id !== orderId));
     alertService.markOrderAdvanced(orderId);
 
     try {

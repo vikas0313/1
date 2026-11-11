@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ThemeToggle } from '../../components/ThemeToggle.js';
 import { AlertBanner } from '../../components/AlertBanner.js';
+import { useOwnerOrdersSafe } from '../../context/OwnerOrdersContext.js';
 import { 
   ClipboardList, 
   UtensilsCrossed, 
@@ -19,7 +20,7 @@ export type OwnerTab = 'orders' | 'menu' | 'tables' | 'sales' | 'settings';
 interface OwnerLayoutProps {
   currentTab: OwnerTab;
   onTabChange: (tab: OwnerTab) => void;
-  sseStatus: 'connected' | 'reconnecting' | 'disconnected';
+  sseStatus?: 'connected' | 'reconnecting' | 'disconnected';
   pendingOrdersCount?: number;
   children: React.ReactNode;
 }
@@ -27,11 +28,15 @@ interface OwnerLayoutProps {
 export const OwnerLayout: React.FC<OwnerLayoutProps> = ({
   currentTab,
   onTabChange,
-  sseStatus,
-  pendingOrdersCount = 0,
+  sseStatus: propSseStatus,
+  pendingOrdersCount: propPendingOrdersCount,
   children,
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const context = useOwnerOrdersSafe();
+
+  const sseStatus = propSseStatus ?? context?.sseStatus ?? 'connected';
+  const pendingOrdersCount = propPendingOrdersCount ?? context?.pendingOrdersCount ?? 0;
 
   const handleLogout = async () => {
     try {

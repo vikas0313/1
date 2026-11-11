@@ -34,12 +34,23 @@ export class AlertService {
 
   private constructor() {
     this.loadSettings();
-    if (typeof document !== 'undefined') {
+    if (typeof window !== 'undefined') {
       document.addEventListener('visibilitychange', () => {
         if (document.visibilityState === 'visible' && this.wakeLock !== null) {
           this.requestWakeLock();
         }
       });
+
+      // Auto-unlock audio engine on the first user interaction anywhere
+      const autoUnlock = () => {
+        if (!this.isUnlocked) {
+          this.unlock().catch(() => {});
+        }
+      };
+      window.addEventListener('click', autoUnlock, { passive: true });
+      window.addEventListener('touchstart', autoUnlock, { passive: true });
+      window.addEventListener('pointerdown', autoUnlock, { passive: true });
+      window.addEventListener('keydown', autoUnlock, { passive: true });
     }
   }
 
@@ -83,20 +94,32 @@ export class AlertService {
     this.restartRepeatTimer();
   }
 
+  public async ensureAudioContext(): Promise<AudioContext | null> {
+    try {
+      const AudioCtx = (window as any).AudioContext || (window as any).webkitAudioContext;
+      if (!this.audioContext && AudioCtx) {
+        this.audioContext = new AudioCtx();
+      }
+      if (this.audioContext && this.audioContext.state === 'suspended') {
+        await this.audioContext.resume().catch(() => {});
+      }
+      return this.audioContext;
+    } catch {
+      return null;
+    }
+  }
+
   public async unlock(ctx?: AudioContext): Promise<boolean> {
     try {
-      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
-      if (!this.audioContext && AudioCtx) {
-        this.audioContext = ctx || new AudioCtx();
-      }
-
-      if (this.audioContext && this.audioContext.state === 'suspended') {
-        await this.audioContext.resume();
+      const audioCtx = ctx || (await this.ensureAudioContext());
+      if (audioCtx && audioCtx.state === 'suspended') {
+        await audioCtx.resume().catch(() => {});
       }
 
       // Unlock speechSynthesis with a silent utterance
       if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-        const silentUtterance = new SpeechSynthesisUtterance('');
+        window.speechSynthesis.cancel();
+        const silentUtterance = new SpeechSynthesisUtterance(' ');
         silentUtterance.volume = 0;
         window.speechSynthesis.speak(silentUtterance);
       }
@@ -198,8 +221,11 @@ export class AlertService {
 
   public formatTableSpeech(tableLabel: string): string {
     const cleaned = (tableLabel || '').trim();
-    // T3 -> Table 3, Table 3 -> Table 3, 3 -> Table 3
-    const match = cleaned.match(/^(?:T|Table\s*)?(\d+)$/i);
+    if (!cleaned) return 'Table';
+    if (/^table\b/i.test(cleaned)) {
+      return cleaned;
+    }
+    const match = cleaned.match(/^(?:T\s*[-_]?\s*)?(\d+)$/i);
     if (match) {
       return `Table ${match[1]}`;
     }
@@ -226,7 +252,7 @@ export class AlertService {
   public async playAttentionTone(): Promise<void> {
     if (this.settings.muted) return;
     try {
-      const ctx = this.audioContext;
+      const ctx = await this.ensureAudioContext();
       if (!ctx || ctx.state !== 'running') return;
 
       const osc = ctx.createOscillator();
@@ -236,7 +262,7 @@ export class AlertService {
       osc.frequency.setValueAtTime(587.33, ctx.currentTime); // D5
       osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.12); // A5
 
-      const targetVol = this.settings.volume * 0.35;
+      const targetVol = Math.max(0.18, this.settings.volume * 0.45);
       gain.gain.setValueAtTime(0.001, ctx.currentTime);
       gain.gain.linearRampToValueAtTime(targetVol, ctx.currentTime + 0.04);
       gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.28);
@@ -256,7 +282,7 @@ export class AlertService {
   public async playFallbackBeeps(): Promise<void> {
     if (this.settings.muted) return;
     try {
-      const ctx = this.audioContext;
+      const ctx = await this.ensureAudioContext();
       if (!ctx || ctx.state !== 'running') return;
 
       for (let i = 0; i < 3; i++) {
@@ -266,7 +292,7 @@ export class AlertService {
         osc.type = 'square';
         osc.frequency.setValueAtTime(880, ctx.currentTime);
 
-        const targetVol = this.settings.volume * 0.25;
+        const targetVol = Math.max(0.15, this.settings.volume * 0.3);
         gain.gain.setValueAtTime(targetVol, ctx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
 
@@ -290,26 +316,61 @@ export class AlertService {
       }
 
       try {
+        // Cancel pending utterances to prevent Chrome audio hang
+        window.speechSynthesis.cancel();
+
         const utterance = new SpeechSynthesisUtterance(text);
-        utterance.volume = this.settings.volume;
+        utterance.volume = Math.max(0.5, this.settings.volume);
         utterance.rate = 1.0;
         utterance.pitch = 1.0;
+        utterance.lang = 'en-US';
 
+        const voices = window.speechSynthesis.getVoices();
         if (this.settings.voiceURI) {
-          const voices = window.speechSynthesis.getVoices();
           const voice = voices.find((v) => v.voiceURI === this.settings.voiceURI);
           if (voice) {
             utterance.voice = voice;
           }
+        } else if (voices.length > 0) {
+          // Prefer a clear English voice
+          const enVoice =
+            voices.find((v) => v.lang.startsWith('en') && (v.name.includes('Natural') || v.name.includes('Google') || v.name.includes('David') || v.name.includes('Samantha'))) ||
+            voices.find((v) => v.lang.startsWith('en'));
+          if (enVoice) {
+            utterance.voice = enVoice;
+          }
         }
 
-        utterance.onend = () => resolve(true);
-        utterance.onerror = () => resolve(false);
+        let finished = false;
+        utterance.onend = () => {
+          if (!finished) {
+            finished = true;
+            resolve(true);
+          }
+        };
+
+        utterance.onerror = (e) => {
+          console.warn('speechSynthesis error', e);
+          if (!finished) {
+            finished = true;
+            resolve(false);
+          }
+        };
 
         window.speechSynthesis.speak(utterance);
 
+        // Resume if suspended (common Chrome issue)
+        if (window.speechSynthesis.paused) {
+          window.speechSynthesis.resume();
+        }
+
         // Safety timeout in case speechSynthesis hangs
-        setTimeout(() => resolve(true), 4000);
+        setTimeout(() => {
+          if (!finished) {
+            finished = true;
+            resolve(true);
+          }
+        }, 4000);
       } catch (e) {
         resolve(false);
       }

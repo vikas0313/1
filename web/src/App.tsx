@@ -11,6 +11,7 @@ import { BottomNav, NavTab } from './components/BottomNav.js';
 // Owner Components
 import { OwnerAuthGuard } from './features/owner/OwnerAuthGuard.js';
 import { OwnerLayout, OwnerTab } from './features/owner/OwnerLayout.js';
+import { OwnerOrdersProvider } from './context/OwnerOrdersContext.js';
 import { OrdersPage } from './features/owner/OrdersPage.js';
 import { MenuManagerPage } from './features/owner/MenuManagerPage.js';
 import { TablesPage } from './features/owner/TablesPage.js';
@@ -78,27 +79,22 @@ export const App: React.FC = () => {
     setScreen('payment');
   };
 
-  // If on Owner route, wrap in AuthGuard and Layout
+  // If on Owner route, wrap in AuthGuard, Orders Provider, and Layout
   if (isOwnerRoute) {
     return (
       <OwnerAuthGuard>
-        <OwnerLayout
-          currentTab={ownerTab}
-          onTabChange={setOwnerTab}
-          sseStatus={sseStatus}
-          pendingOrdersCount={pendingOrdersCount}
-        >
-          {ownerTab === 'orders' && (
-            <OrdersPage
-              onOrdersCountChange={setPendingOrdersCount}
-              onSseStatusChange={setSseStatus}
-            />
-          )}
-          {ownerTab === 'menu' && <MenuManagerPage />}
-          {ownerTab === 'tables' && <TablesPage />}
-          {ownerTab === 'sales' && <SalesPage />}
-          {ownerTab === 'settings' && <SettingsPage />}
-        </OwnerLayout>
+        <OwnerOrdersProvider>
+          <OwnerLayout
+            currentTab={ownerTab}
+            onTabChange={setOwnerTab}
+          >
+            {ownerTab === 'orders' && <OrdersPage />}
+            {ownerTab === 'menu' && <MenuManagerPage />}
+            {ownerTab === 'tables' && <TablesPage />}
+            {ownerTab === 'sales' && <SalesPage />}
+            {ownerTab === 'settings' && <SettingsPage />}
+          </OwnerLayout>
+        </OwnerOrdersProvider>
       </OwnerAuthGuard>
     );
   }

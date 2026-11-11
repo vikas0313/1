@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '../../components/Button.js';
+import { alertService } from '../../services/AlertService.js';
 import { Lock } from 'lucide-react';
 
 interface OwnerLoginPageProps {
@@ -53,6 +54,8 @@ export const OwnerLoginPage: React.FC<OwnerLoginPageProps> = ({ onLoginSuccess }
         return;
       }
 
+      // Auto-unlock audio engine on login gesture
+      await alertService.unlock();
       onLoginSuccess();
     } catch (err) {
       setError('Connection error. Could not reach server.');
