@@ -3,6 +3,7 @@ import { apiAdapter } from '../../data/ApiAdapter.js';
 import { Button } from '../../components/Button.js';
 import { ThemeToggle } from '../../components/ThemeToggle.js';
 import { InvalidTablePage } from './InvalidTablePage.js';
+import { Phone, UtensilsCrossed } from 'lucide-react';
 
 export interface WelcomePageProps {
   onStartOrdering: (tableLabel: string, customerName: string) => void;
@@ -17,7 +18,6 @@ export const WelcomePage: React.FC<WelcomePageProps> = ({ onStartOrdering }) => 
   const [phone, setPhone] = useState<string>('+91 98765 43210');
 
   useEffect(() => {
-    // Read table parameter from URL (e.g. ?table=T1)
     const params = new URLSearchParams(window.location.search);
     const tableParam = params.get('table') || sessionStorage.getItem('ritsu_table') || '';
     const storedName = sessionStorage.getItem('ritsu_customer_name') || '';
@@ -34,25 +34,22 @@ export const WelcomePage: React.FC<WelcomePageProps> = ({ onStartOrdering }) => 
 
     setTableLabel(tableParam);
 
-    // Validate table existence against backend
     apiAdapter
       .getTable(tableParam)
       .then((table) => {
         setIsTableValid(Boolean(table && table.active));
       })
       .catch(() => {
-        // Fallback for offline or local preview
         setIsTableValid(tableParam.toUpperCase().startsWith('T'));
       })
       .finally(() => {
         setIsValidatingTable(false);
       });
 
-    // Fetch restaurant phone
     apiAdapter
       .getRestaurantSettings()
       .then((s) => setPhone(s.phone))
-      .catch(() => { });
+      .catch(() => {});
   }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -74,8 +71,8 @@ export const WelcomePage: React.FC<WelcomePageProps> = ({ onStartOrdering }) => 
 
   if (isValidatingTable) {
     return (
-      <div className="min-h-screen bg-[var(--bg-canvas)] flex items-center justify-center p-6">
-        <div className="font-serif text-lg text-[var(--gold-ink)] animate-pulse">
+      <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center p-6">
+        <div className="text-[16px] font-medium text-[var(--accent-ink)] animate-pulse">
           Connecting to table...
         </div>
       </div>
@@ -87,71 +84,79 @@ export const WelcomePage: React.FC<WelcomePageProps> = ({ onStartOrdering }) => 
   }
 
   return (
-    <div className="min-h-screen bg-[var(--bg-canvas)] flex flex-col justify-between p-6 max-w-lg mx-auto">
-      <header className="flex justify-between items-center pt-2">
-        <span className="text-[12px] uppercase tracking-widest font-semibold text-[var(--gold-ink)]">
-          Table {tableLabel}
-        </span>
-        <ThemeToggle />
-      </header>
+    <div className="min-h-screen bg-[var(--bg)] flex flex-col justify-center items-center p-4 sm:p-6">
+      {/* Central Warm Card */}
+      <div className="w-full max-w-[500px] warm-card p-6 sm:p-8 flex flex-col justify-between my-auto">
+        <header className="flex justify-between items-center mb-6">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[var(--surface-2)] border border-[var(--border)] text-[var(--text)]">
+            <span className="w-2 h-2 rounded-full bg-[var(--accent)]" />
+            <span className="text-[13px] font-semibold">Table {tableLabel}</span>
+          </div>
+          <ThemeToggle />
+        </header>
 
-      <main className="my-auto py-8 text-center">
-        <div className="w-16 h-16 mx-auto mb-6 border-2 border-[var(--border-gold)] text-[var(--gold-ink)] flex items-center justify-center font-serif text-3xl font-bold rounded-[2px]">
-          R
-        </div>
-
-        <h1 className="font-serif text-4xl sm:text-5xl font-normal text-[var(--text-primary)] mb-2 tracking-tight">
-          Ritsu Food Corner
-        </h1>
-
-        <p className="font-serif italic text-[16px] text-[var(--gold-ink)] mb-8">
-          Indo-Chinese ka asli maza – Ritsu ke saath!
-        </p>
-
-        <form onSubmit={handleSubmit} className="space-y-4 max-w-sm mx-auto text-left">
-          <div>
-            <label
-              htmlFor="customer-name"
-              className="block text-[12px] uppercase tracking-wider font-semibold text-[var(--text-secondary)] mb-1.5"
-            >
-              Your Name
-            </label>
-            <input
-              id="customer-name"
-              type="text"
-              autoFocus
-              maxLength={40}
-              placeholder="e.g. Rahul Sharma"
-              value={customerName}
-              onChange={(e) => {
-                setCustomerName(e.target.value);
-                setNameError('');
-              }}
-              className="w-full h-12 px-4 text-[15px] bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-[2px] text-[var(--text-primary)] focus:border-[var(--border-gold)] focus:outline-none transition-colors"
-            />
-            {nameError && (
-              <p className="text-[12px] text-red-600 mt-1 font-medium">{nameError}</p>
-            )}
+        <main className="text-center py-4">
+          <div className="w-16 h-16 mx-auto mb-5 rounded-2xl bg-[var(--accent)]/15 border border-[var(--accent)]/30 text-[var(--accent-ink)] flex items-center justify-center shadow-xs">
+            <UtensilsCrossed className="w-8 h-8" />
           </div>
 
-          <Button type="submit" variant="primary" className="w-full">
-            Start Ordering
-          </Button>
-        </form>
-      </main>
+          <h1 className="text-[28px] sm:text-[34px] font-bold text-[var(--text)] tracking-tight leading-tight mb-2">
+            Welcome to Ritsu
+          </h1>
 
-      <footer className="text-center pb-4 border-t border-[var(--border-hairline)] pt-4">
-        <p className="text-[12px] text-[var(--text-secondary)] mb-1">
-          Hosting a party or bulk event?
-        </p>
-        <a
-          href={`tel:${phone.replace(/[^0-9+]/g, '')}`}
-          className="text-[13px] font-semibold text-[var(--gold-ink)] hover:underline"
-        >
-          Call us: {phone}
-        </a>
-      </footer>
+          <p className="text-[15px] sm:text-[16px] text-[var(--text-muted)] mb-8 leading-relaxed max-w-xs mx-auto">
+            Indo-Chinese street kitchen. Freshly tossed and served hot to your table.
+          </p>
+
+          <form onSubmit={handleSubmit} className="space-y-4 text-left">
+            <div>
+              <label
+                htmlFor="customer-name"
+                className="block text-[13px] font-semibold text-[var(--text)] mb-2"
+              >
+                Your name
+              </label>
+              <input
+                id="customer-name"
+                type="text"
+                autoFocus
+                maxLength={40}
+                placeholder="e.g. Rahul Sharma"
+                value={customerName}
+                onChange={(e) => {
+                  setCustomerName(e.target.value);
+                  setNameError('');
+                }}
+                className="touch-target w-full h-12 px-4 text-[15px] bg-[var(--surface-2)] border border-[var(--border)] rounded-full text-[var(--text)] focus:border-[var(--accent)] focus:bg-[var(--surface)] focus:outline-none transition-all"
+              />
+              {nameError && (
+                <p className="text-[12px] text-[var(--danger)] mt-1.5 ml-2 font-medium">
+                  {nameError}
+                </p>
+              )}
+            </div>
+
+            <Button type="submit" variant="primary" size="lg" className="w-full mt-2">
+              Start ordering
+            </Button>
+          </form>
+        </main>
+
+        <footer className="text-center pt-6 mt-6 border-t border-[var(--border)]">
+          <p className="text-[12px] text-[var(--text-muted)] mb-1">
+            Hosting a party or bulk event?
+          </p>
+          <a
+            href={`tel:${phone.replace(/[^0-9+]/g, '')}`}
+            className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-[var(--accent-ink)] hover:underline"
+          >
+            <Phone className="w-3.5 h-3.5" />
+            <span>Call us: {phone}</span>
+          </a>
+        </footer>
+      </div>
     </div>
   );
 };
+
 

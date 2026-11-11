@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import type { CartLine } from '@ritsu/shared';
 import { calculateBill } from '@ritsu/shared';
 import { Stepper } from '../../components/Stepper.js';
 import { Button } from '../../components/Button.js';
+import { X, ShoppingBag } from 'lucide-react';
 
 export interface CartSheetProps {
   isOpen: boolean;
@@ -25,7 +26,7 @@ export const CartSheet: React.FC<CartSheetProps> = ({
   tableLabel,
   customerName,
 }) => {
-  const [orderNote, setOrderNote] = React.useState('');
+  const [orderNote, setOrderNote] = useState('');
 
   if (!isOpen) return null;
 
@@ -38,34 +39,45 @@ export const CartSheet: React.FC<CartSheetProps> = ({
   );
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-xs animate-in fade-in">
+    <div
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-xs transition-opacity animate-in fade-in duration-200"
+      onClick={onClose}
+    >
       <div
-        className="w-full sm:max-w-lg bg-[var(--bg-surface)] border-t sm:border border-[var(--border-gold)] rounded-t-[4px] sm:rounded-[2px] max-h-[90vh] flex flex-col shadow-2xl animate-in slide-in-from-bottom-8"
+        className="w-full sm:max-w-lg bg-[var(--surface)] border-t sm:border border-[var(--border)] rounded-t-[28px] sm:rounded-[24px] max-h-[90vh] flex flex-col shadow-2xl animate-in slide-in-from-bottom-6 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
+        {/* Mobile Pull Handle Indicator */}
+        <div className="w-12 h-1.5 bg-[var(--border)] rounded-full mx-auto mt-3 sm:hidden" />
+
         {/* Header */}
-        <div className="p-4 border-b border-[var(--border-hairline)] flex items-center justify-between">
+        <div className="p-5 border-b border-[var(--border)] flex items-center justify-between">
           <div>
-            <h2 className="font-serif text-xl font-bold text-[var(--text-primary)]">
-              Your Order · Table {tableLabel}
-            </h2>
-            <p className="text-[12px] text-[var(--text-secondary)]">Ordering for {customerName}</p>
+            <div className="flex items-center gap-2">
+              <ShoppingBag className="w-5 h-5 text-[var(--accent-ink)]" />
+              <h2 className="text-[18px] sm:text-[20px] font-bold text-[var(--text)]">
+                Your order · Table {tableLabel}
+              </h2>
+            </div>
+            <p className="text-[12px] text-[var(--text-muted)] mt-0.5">
+              Ordering for {customerName}
+            </p>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] p-2 text-xl font-bold"
+            className="touch-target w-10 h-10 rounded-[16px] bg-[var(--surface-2)] border border-[var(--border)] flex items-center justify-center text-[var(--text)] hover:border-[var(--accent)]/50 active:scale-95 transition-all"
             aria-label="Close cart"
           >
-            ×
+            <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Items List */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-3 divide-y divide-[var(--border-hairline)]">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3 divide-y divide-[var(--border)]/60">
           {cart.length === 0 ? (
-            <div className="text-center py-12 text-[var(--text-secondary)]">
-              Your cart is empty. Please select items from the menu.
+            <div className="text-center py-12 text-[var(--text-muted)] text-[14px]">
+              Your cart is empty. Add dishes from the menu to start your order.
             </div>
           ) : (
             cart.map((line) => (
@@ -74,26 +86,27 @@ export const CartSheet: React.FC<CartSheetProps> = ({
                 className="pt-3 first:pt-0 flex items-center justify-between gap-3"
               >
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-1.5">
+                  <div className="flex items-center gap-2">
                     <span
-                      className={`w-2 h-2 rounded-full shrink-0 ${
-                        line.is_veg ? 'bg-[var(--veg-dot)]' : 'bg-[var(--non-veg-dot)]'
+                      className={`w-2.5 h-2.5 rounded-full shrink-0 ${
+                        line.is_veg ? 'bg-[var(--veg)]' : 'bg-[var(--nonveg)]'
                       }`}
                     />
-                    <h4 className="text-[14px] font-medium text-[var(--text-primary)] truncate">
+                    <h4 className="text-[15px] font-semibold text-[var(--text)] truncate">
                       {line.name}
                     </h4>
                   </div>
-                  <span className="text-[12px] text-[var(--text-secondary)]">
+                  <span className="text-[12px] text-[var(--text-muted)] ml-4.5">
                     {line.variant_label} · ₹{line.unit_price_paise / 100}
                   </span>
                 </div>
 
-                <div className="flex items-center gap-3">
-                  <span className="font-serif text-[15px] font-semibold text-[var(--text-primary)] tabular-nums">
+                <div className="flex items-center gap-3 shrink-0">
+                  <span className="text-[16px] font-bold text-[var(--text)] tabular-nums">
                     ₹{(line.unit_price_paise * line.quantity) / 100}
                   </span>
                   <Stepper
+                    size="sm"
                     value={line.quantity}
                     onChange={(qty) => onUpdateQuantity(line.item_id, line.variant_id, qty)}
                   />
@@ -105,37 +118,44 @@ export const CartSheet: React.FC<CartSheetProps> = ({
 
         {/* Notes & Summary */}
         {cart.length > 0 && (
-          <div className="p-4 border-t border-[var(--border-hairline)] bg-[var(--bg-surface-elevated)] space-y-3">
+          <div className="p-4 sm:p-5 border-t border-[var(--border)] bg-[var(--surface-2)]/60 space-y-3.5">
             <div>
+              <label
+                htmlFor="cart-order-note"
+                className="block text-[12px] font-semibold text-[var(--text)] mb-1"
+              >
+                Special instructions (optional)
+              </label>
               <input
+                id="cart-order-note"
                 type="text"
-                placeholder="Kitchen note (e.g. less spicy, extra lemon)..."
+                placeholder="e.g. less spicy, extra lemon, no onions"
                 maxLength={200}
                 value={orderNote}
                 onChange={(e) => setOrderNote(e.target.value)}
-                className="w-full h-10 px-3 text-[13px] bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-[2px] text-[var(--text-primary)] focus:border-[var(--border-gold)] focus:outline-none"
+                className="w-full h-11 px-4 text-[14px] bg-[var(--surface)] border border-[var(--border)] rounded-full text-[var(--text)] focus:border-[var(--accent)] focus:outline-none transition-all"
               />
             </div>
 
             {/* Bill Breakdown */}
-            <div className="text-[13px] space-y-1 text-[var(--text-secondary)]">
+            <div className="text-[13px] space-y-1.5 text-[var(--text-muted)] pt-1">
               <div className="flex justify-between">
                 <span>Subtotal</span>
-                <span className="font-serif tabular-nums text-[var(--text-primary)]">
+                <span className="tabular-nums font-semibold text-[var(--text)]">
                   ₹{(bill.subtotal_paise / 100).toFixed(2)}
                 </span>
               </div>
               <div className="flex justify-between text-[12px]">
                 <span>CGST (2.5%)</span>
-                <span className="font-serif tabular-nums">₹{(bill.cgst_paise / 100).toFixed(2)}</span>
+                <span className="tabular-nums">₹{(bill.cgst_paise / 100).toFixed(2)}</span>
               </div>
               <div className="flex justify-between text-[12px]">
                 <span>SGST (2.5%)</span>
-                <span className="font-serif tabular-nums">₹{(bill.sgst_paise / 100).toFixed(2)}</span>
+                <span className="tabular-nums">₹{(bill.sgst_paise / 100).toFixed(2)}</span>
               </div>
-              <div className="flex justify-between font-serif text-[18px] font-bold text-[var(--text-primary)] pt-1 border-t border-[var(--border-hairline)]">
+              <div className="flex justify-between text-[18px] font-bold text-[var(--text)] pt-2 border-t border-[var(--border)]">
                 <span>Total Amount</span>
-                <span className="tabular-nums text-[var(--gold-ink)]">
+                <span className="tabular-nums text-[var(--accent-ink)]">
                   ₹{(bill.total_paise / 100).toFixed(2)}
                 </span>
               </div>
@@ -143,11 +163,12 @@ export const CartSheet: React.FC<CartSheetProps> = ({
 
             <Button
               variant="primary"
+              size="lg"
               className="w-full mt-2"
               isLoading={isSubmitting}
               onClick={() => onPlaceOrder(orderNote)}
             >
-              Place Order (₹{(bill.total_paise / 100).toFixed(2)})
+              Place order · ₹{(bill.total_paise / 100).toFixed(2)}
             </Button>
           </div>
         )}
@@ -155,4 +176,5 @@ export const CartSheet: React.FC<CartSheetProps> = ({
     </div>
   );
 };
+
 

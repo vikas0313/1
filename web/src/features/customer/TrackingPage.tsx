@@ -3,7 +3,9 @@ import type { Order, OrderStatus } from '@ritsu/shared';
 import { apiAdapter } from '../../data/ApiAdapter.js';
 import { Button } from '../../components/Button.js';
 import { Badge } from '../../components/Badge.js';
-import { ThemeToggle } from '../../components/ThemeToggle.js';
+import { TopBar } from '../../components/TopBar.js';
+import { StepProgress } from '../../components/StepProgress.js';
+import { Clock, Plus, Receipt } from 'lucide-react';
 
 export interface TrackingPageProps {
   order: Order;
@@ -11,11 +13,11 @@ export interface TrackingPageProps {
   onViewBill: () => void;
 }
 
-const STEPS: Array<{ key: OrderStatus; label: string; description: string }> = [
-  { key: 'pending', label: 'Pending', description: 'Order received by the kitchen' },
-  { key: 'preparing', label: 'Preparing', description: 'Chef is cooking your delicious food' },
-  { key: 'ready', label: 'Ready', description: 'Your order is hot and ready to serve' },
-  { key: 'complete', label: 'Served', description: 'Enjoy your meal! Indo-Chinese ka asli maza!' },
+const STEPS: Array<{ key: OrderStatus; label: string; description: string; stepNumber: number }> = [
+  { key: 'pending', label: 'Order placed', description: 'Order received by the kitchen. Preparing starts shortly.', stepNumber: 1 },
+  { key: 'preparing', label: 'Preparing your food', description: 'Freshly tossed and cooked hot in the wok.', stepNumber: 2 },
+  { key: 'ready', label: 'Ready to serve', description: 'Your dishes are plated and coming to your table.', stepNumber: 3 },
+  { key: 'complete', label: 'Order completed', description: 'Enjoy your meal! Indo-Chinese ka asli maza.', stepNumber: 4 },
 ];
 
 export const TrackingPage: React.FC<TrackingPageProps> = ({
@@ -27,7 +29,6 @@ export const TrackingPage: React.FC<TrackingPageProps> = ({
   const [connectionStatus, setConnectionStatus] = useState<'connected' | 'reconnecting' | 'polling'>('connected');
 
   useEffect(() => {
-    // Subscribe to SSE updates for this specific order
     const unsubscribe = apiAdapter.subscribeToOrder(
       order.public_token,
       (updatedOrder) => {
@@ -41,156 +42,132 @@ export const TrackingPage: React.FC<TrackingPageProps> = ({
     return () => unsubscribe();
   }, [order.public_token]);
 
-  const currentStepIndex = STEPS.findIndex((s) => s.key === order.status);
+  const activeStepConfig = STEPS.find((s) => s.key === order.status) || STEPS[0];
   const isCancelled = order.status === 'cancelled';
 
   return (
-    <div className="min-h-screen bg-[var(--bg-canvas)] p-4 sm:p-6 max-w-xl mx-auto flex flex-col justify-between">
-      {/* Header */}
-      <header className="flex items-center justify-between pb-4 border-b border-[var(--border-hairline)]">
-        <div>
-          <span className="text-[12px] uppercase tracking-wider font-semibold text-[var(--gold-ink)]">
-            Live Tracking · Table {order.table_label}
-          </span>
-          <h1 className="font-serif text-2xl font-bold text-[var(--text-primary)]">
-            Order {order.order_no}
-          </h1>
-        </div>
-        <div className="flex items-center gap-2">
-          {connectionStatus === 'connected' && (
-            <span className="flex items-center gap-1.5 text-[11px] uppercase tracking-wider text-emerald-600 font-semibold">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              Live
-            </span>
-          )}
-          <ThemeToggle />
-        </div>
-      </header>
+    <div className="min-h-screen bg-[var(--bg)] flex flex-col justify-between">
+      <TopBar
+        title={`Order #${order.order_no}`}
+        subtitle={`Live tracking · Table ${order.table_label}`}
+        tableLabel={order.table_label}
+      />
 
-      {/* Main Status Tracker */}
-      <main className="my-auto py-8 space-y-8 text-center">
+      <main className="max-w-md w-full mx-auto px-4 py-6 flex-1 flex flex-col justify-center space-y-6">
         {isCancelled ? (
-          <div className="bg-red-500/10 border border-red-500/30 p-6 rounded-[2px]">
-            <h2 className="font-serif text-2xl font-bold text-red-600 mb-1">Order Cancelled</h2>
-            <p className="text-[14px] text-[var(--text-secondary)]">
-              This order was cancelled by the kitchen. Please talk to the restaurant staff.
+          <div className="warm-card p-6 border-red-200 dark:border-red-900 text-center">
+            <Badge variant="status" status="cancelled" className="mb-3">
+              Cancelled
+            </Badge>
+            <h2 className="text-[20px] font-bold text-[var(--danger)] mb-2">Order cancelled</h2>
+            <p className="text-[14px] text-[var(--text-muted)] leading-relaxed">
+              This order was cancelled by the kitchen. Please speak with our restaurant team.
             </p>
           </div>
         ) : (
-          <div>
-            {/* Current Status Headline */}
-            <div className="mb-6">
-              <Badge variant="status" status={order.status} className="mb-2 text-[12px] px-3 py-1">
-                Status: {order.status}
+          /* Live Progress Warm Card */
+          <div className="warm-card p-6 text-center space-y-5">
+            <div className="flex items-center justify-between">
+              <Badge variant="status" status={order.status}>
+                {order.status}
               </Badge>
-              <h2 className="font-serif text-3xl font-bold text-[var(--text-primary)]">
-                {STEPS[currentStepIndex]?.label || order.status}
+              {connectionStatus === 'connected' && (
+                <span className="flex items-center gap-1.5 text-[12px] font-semibold text-[var(--success)]">
+                  <span className="w-2 h-2 rounded-full bg-[var(--success)] animate-pulse" />
+                  Live sync
+                </span>
+              )}
+            </div>
+
+            <div>
+              <h2 className="text-[24px] sm:text-[28px] font-bold text-[var(--text)] tracking-tight leading-snug">
+                {activeStepConfig.label}
               </h2>
-              <p className="text-[14px] text-[var(--text-secondary)] mt-1">
-                {STEPS[currentStepIndex]?.description}
+              <p className="text-[14px] text-[var(--text-muted)] mt-1 leading-relaxed">
+                {activeStepConfig.description}
               </p>
             </div>
 
-            {/* 4-Step Horizontal Stepper */}
-            <div className="flex items-center justify-between relative max-w-md mx-auto my-6 px-2 select-none">
-              {/* Background Connecting Line */}
-              <div className="absolute top-4 left-6 right-6 h-0.5 bg-[var(--border-hairline)] -z-0" />
-              {/* Progress Line */}
-              <div
-                className="absolute top-4 left-6 h-0.5 bg-[var(--border-gold)] -z-0 transition-all duration-500"
-                style={{
-                  width: `${(Math.max(0, currentStepIndex) / (STEPS.length - 1)) * 88}%`,
-                }}
-              />
-
-              {STEPS.map((step, idx) => {
-                const isPassed = idx <= currentStepIndex;
-                const isCurrent = idx === currentStepIndex;
-
-                return (
-                  <div key={step.key} className="flex flex-col items-center relative z-10">
-                    <div
-                      className={`w-8 h-8 rounded-full flex items-center justify-center text-[12px] font-bold border-2 transition-all ${
-                        isCurrent
-                          ? 'bg-[var(--gold-ink)] text-[var(--gold-ink-contrast)] border-[var(--gold-ink)] scale-110 shadow-md ring-4 ring-[var(--gold-ink)]/20'
-                          : isPassed
-                          ? 'bg-[var(--bg-surface)] text-[var(--gold-ink)] border-[var(--border-gold)]'
-                          : 'bg-[var(--bg-canvas)] text-[var(--text-tertiary)] border-[var(--border-hairline)]'
-                      }`}
-                    >
-                      {isPassed && !isCurrent ? '✓' : idx + 1}
-                    </div>
-                    <span
-                      className={`text-[11px] uppercase tracking-wider mt-2 font-medium ${
-                        isPassed ? 'text-[var(--text-primary)]' : 'text-[var(--text-tertiary)]'
-                      }`}
-                    >
-                      {step.label}
-                    </span>
-                  </div>
-                );
-              })}
+            {/* 4 Chunky Rounded Blocks Progress Indicator */}
+            <div className="pt-2 pb-1">
+              <StepProgress currentStep={activeStepConfig.stepNumber} totalSteps={4} />
             </div>
           </div>
         )}
 
-        {/* Order Details Card */}
-        <div className="bg-[var(--bg-surface)] border border-[var(--border-hairline)] p-4 rounded-[2px] text-left">
-          <div className="flex justify-between items-center mb-3 pb-2 border-b border-[var(--border-hairline)]">
-            <span className="text-[12px] uppercase font-semibold text-[var(--text-secondary)]">
-              Items Ordered ({order.items.length})
+        {/* Order Details Warm Card */}
+        <div className="warm-card p-5 space-y-4">
+          <div className="flex justify-between items-center pb-3 border-b border-[var(--border)]">
+            <span className="text-[13px] font-semibold text-[var(--text)]">
+              Items ordered ({order.items.length})
             </span>
-            <span className="text-[12px] font-medium text-[var(--text-secondary)]">
+            <span className="text-[12px] font-medium text-[var(--text-muted)]">
               Payment:{' '}
               <span
-                className={
+                className={`font-semibold ml-1 ${
                   order.payment_status === 'paid'
-                    ? 'text-emerald-600 font-bold'
-                    : 'text-amber-600 font-bold'
-                }
+                    ? 'text-[var(--success)]'
+                    : 'text-[var(--warning)]'
+                }`}
               >
-                {order.payment_status.toUpperCase()}
+                {order.payment_status === 'paid' ? 'Paid' : 'Unpaid'}
               </span>
             </span>
           </div>
 
-          <div className="space-y-2 text-[14px]">
+          <div className="space-y-2.5 text-[14px]">
             {order.items.map((item) => (
               <div key={item.id} className="flex justify-between items-center">
-                <span>
+                <span className="text-[var(--text)]">
                   {item.quantity} × {item.name_snapshot}{' '}
-                  <span className="text-[12px] text-[var(--text-secondary)]">
+                  <span className="text-[12px] text-[var(--text-muted)]">
                     ({item.variant_label_snapshot})
                   </span>
                 </span>
-                <span className="font-serif tabular-nums font-semibold">
+                <span className="tabular-nums font-semibold text-[var(--text)]">
                   ₹{(item.unit_price_paise * item.quantity) / 100}
                 </span>
               </div>
             ))}
           </div>
 
-          <div className="mt-3 pt-2 border-t border-[var(--border-hairline)] flex justify-between font-serif text-[18px] font-bold">
-            <span>Total Bill:</span>
-            <span className="text-[var(--gold-ink)]">₹{(order.total_paise / 100).toFixed(2)}</span>
+          <div className="pt-3 border-t border-[var(--border)] flex justify-between items-center text-[18px] font-bold">
+            <span className="text-[var(--text)]">Total amount</span>
+            <span className="text-[var(--accent-ink)] tabular-nums">
+              ₹{(order.total_paise / 100).toFixed(2)}
+            </span>
           </div>
         </div>
 
-        {/* Action Links */}
+        {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row gap-3">
-          <Button variant="secondary" className="flex-1" onClick={onAddMoreItems}>
-            + Add More Items
+          <Button
+            variant="secondary"
+            size="lg"
+            className="flex-1"
+            onClick={onAddMoreItems}
+          >
+            <Plus className="w-4 h-4 mr-1.5 text-[var(--accent-ink)]" />
+            <span>Add more items</span>
           </Button>
-          <Button variant="primary" className="flex-1" onClick={onViewBill}>
-            View / Print Bill
+
+          <Button
+            variant="primary"
+            size="lg"
+            className="flex-1"
+            onClick={onViewBill}
+          >
+            <Receipt className="w-4 h-4 mr-1.5" />
+            <span>View receipt</span>
           </Button>
         </div>
       </main>
 
-      <footer className="text-center pt-4 border-t border-[var(--border-hairline)] text-[12px] text-[var(--text-secondary)]">
-        Questions about your order? Wave or speak to any staff member.
+      <footer className="text-center p-4 border-t border-[var(--border)] text-[12px] text-[var(--text-muted)] max-w-md w-full mx-auto">
+        Have questions or need assistance? Please speak with our friendly team.
       </footer>
     </div>
   );
 };
+
 

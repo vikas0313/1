@@ -9,6 +9,9 @@ import { ThemeToggle } from '../../components/ThemeToggle.js';
 import { OfflineBanner } from '../../components/OfflineBanner.js';
 import { CartSheet } from './CartSheet.js';
 import { Toast } from '../../components/Toast.js';
+import { TopBar } from '../../components/TopBar.js';
+import { CategoryTile } from '../../components/CategoryTile.js';
+import { Search } from 'lucide-react';
 
 export interface MenuPageProps {
   tableLabel: string;
@@ -177,127 +180,145 @@ export const MenuPage: React.FC<MenuPageProps> = ({
       <OfflineBanner />
 
       {/* Header */}
-      <header className="bg-[var(--bg-surface)] border-b border-[var(--border-hairline)] px-4 py-3 sticky top-0 z-30">
-        <div className="max-w-3xl mx-auto flex items-center justify-between">
-          <div>
-            <span className="font-serif text-[18px] font-bold text-[var(--text-primary)] tracking-tight">
-              Ritsu Food Corner
-            </span>
-            <div className="text-[12px] text-[var(--gold-ink)] font-medium">
-              Table {tableLabel} · {customerName}
-            </div>
-          </div>
-          <ThemeToggle />
-        </div>
-      </header>
-
-      {/* Category Tabs */}
-      <TabBar
-        tabs={categories.map((c) => ({ id: c.id, label: c.name }))}
-        activeTabId={activeCategoryId}
-        onSelectTab={(id) => {
-          setActiveCategoryId(id);
-          setSearchQuery('');
-        }}
+      <TopBar
+        title="Ritsu Food Corner"
+        subtitle={`Table ${tableLabel} · ${customerName}`}
+        tableLabel={tableLabel}
       />
 
-      {/* Controls: Search and Diet Filters */}
-      <div className="max-w-3xl mx-auto px-4 py-3 flex flex-col sm:flex-row gap-2.5 items-stretch sm:items-center justify-between border-b border-[var(--border-hairline)]">
-        {/* Search */}
-        <div className="relative flex-1">
-          <input
-            type="search"
-            placeholder="Search all 165 dishes..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full h-9 pl-8 pr-3 text-[13px] bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-[2px] text-[var(--text-primary)] focus:border-[var(--border-gold)] focus:outline-none"
-          />
-          <span className="absolute left-2.5 top-2 text-[var(--text-tertiary)] text-xs">🔍</span>
+      <div className="max-w-7xl mx-auto px-4 pt-3 pb-6">
+        {/* Search Bar & Diet Filters */}
+        <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between mb-4">
+          {/* Search: fully rounded bar */}
+          <div className="relative flex-1">
+            <Search className="w-4 h-4 text-[var(--text-muted)] absolute left-4 top-3.5" />
+            <input
+              type="search"
+              placeholder="Search 165 dishes..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="touch-target w-full h-11 pl-11 pr-4 text-[14px] bg-[var(--surface)] border border-[var(--border)] rounded-full text-[var(--text)] focus:border-[var(--accent)] focus:outline-none transition-all shadow-2xs"
+            />
+          </div>
+
+          {/* Diet Filter Pills */}
+          <div className="flex items-center gap-1.5 self-start sm:self-auto shrink-0 select-none">
+            <button
+              type="button"
+              onClick={() => setDietFilter('all')}
+              className={`touch-target px-4 h-10 text-[13px] rounded-full border font-medium transition-all ${
+                dietFilter === 'all'
+                  ? 'bg-[var(--accent)] text-[var(--on-accent)] border-[var(--accent)] font-semibold shadow-2xs'
+                  : 'bg-[var(--surface)] text-[var(--text-muted)] border-[var(--border)] hover:text-[var(--text)]'
+              }`}
+            >
+              All
+            </button>
+            <button
+              type="button"
+              onClick={() => setDietFilter('veg')}
+              className={`touch-target inline-flex items-center gap-1.5 px-4 h-10 text-[13px] rounded-full border font-medium transition-all ${
+                dietFilter === 'veg'
+                  ? 'bg-emerald-600 text-white border-emerald-600 font-semibold shadow-2xs'
+                  : 'bg-[var(--surface)] text-[var(--veg)] border-[var(--border)] hover:border-emerald-500/40'
+              }`}
+            >
+              <span className="w-2 h-2 rounded-full bg-[var(--veg)] shrink-0" />
+              <span>Veg</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setDietFilter('non_veg')}
+              className={`touch-target inline-flex items-center gap-1.5 px-4 h-10 text-[13px] rounded-full border font-medium transition-all ${
+                dietFilter === 'non_veg'
+                  ? 'bg-red-600 text-white border-red-600 font-semibold shadow-2xs'
+                  : 'bg-[var(--surface)] text-[var(--nonveg)] border-[var(--border)] hover:border-red-500/40'
+              }`}
+            >
+              <span className="w-2 h-2 rounded-full bg-[var(--nonveg)] shrink-0" />
+              <span>Non-Veg</span>
+            </button>
+          </div>
         </div>
 
-        {/* Diet Filter Pills */}
-        <div className="flex items-center gap-1 self-start sm:self-auto shrink-0 select-none">
-          <button
-            type="button"
-            onClick={() => setDietFilter('all')}
-            className={`px-2.5 py-1 text-[12px] uppercase tracking-wider rounded-[2px] border font-medium transition-colors ${dietFilter === 'all'
-              ? 'bg-[var(--gold-ink)] text-[var(--gold-ink-contrast)] border-transparent'
-              : 'bg-[var(--bg-surface)] text-[var(--text-secondary)] border-[var(--border-hairline)] hover:border-[var(--border-gold)]'
-              }`}
-          >
-            All
-          </button>
-          <button
-            type="button"
-            onClick={() => setDietFilter('veg')}
-            className={`px-2.5 py-1 text-[12px] uppercase tracking-wider rounded-[2px] border font-medium transition-colors ${dietFilter === 'veg'
-              ? 'bg-[var(--veg-dot)] text-white border-transparent'
-              : 'bg-[var(--bg-surface)] text-[var(--text-secondary)] border-[var(--border-hairline)] hover:border-[var(--veg-dot)]'
-              }`}
-          >
-            🟢 Veg
-          </button>
-          <button
-            type="button"
-            onClick={() => setDietFilter('non_veg')}
-            className={`px-2.5 py-1 text-[12px] uppercase tracking-wider rounded-[2px] border font-medium transition-colors ${dietFilter === 'non_veg'
-              ? 'bg-[var(--non-veg-dot)] text-white border-transparent'
-              : 'bg-[var(--bg-surface)] text-[var(--text-secondary)] border-[var(--border-hairline)] hover:border-[var(--non-veg-dot)]'
-              }`}
-          >
-            🔴 Non-Veg
-          </button>
-        </div>
-      </div>
-
-      {/* Dishes List */}
-      <main className="max-w-3xl mx-auto px-4 py-2">
-        {isLoading ? (
-          <div>
-            <MenuRowSkeleton />
-            <MenuRowSkeleton />
-            <MenuRowSkeleton />
-            <MenuRowSkeleton />
-          </div>
-        ) : filteredItems.length === 0 ? (
-          <div className="text-center py-16 text-[var(--text-secondary)] text-[14px]">
-            No dishes found matching your selection.
-          </div>
-        ) : (
-          <div>
-            {filteredItems.map((item) => (
-              <MenuRow
-                key={item.id}
-                item={item}
-                onAddToCart={handleAddToCart}
-                onUpdateQuantity={(vId, qty) => handleUpdateQuantity(item.id, vId, qty)}
-                getVariantQuantity={getVariantQuantity}
-              />
-            ))}
+        {/* Category Tiles (Scrollable row) */}
+        {!searchQuery.trim() && (
+          <div className="mb-6">
+            <div className="flex items-center gap-2.5 overflow-x-auto no-scrollbar py-1 px-0.5">
+              {categories.map((c) => (
+                <CategoryTile
+                  key={c.id}
+                  category={c}
+                  isActive={c.id === activeCategoryId}
+                  onClick={() => {
+                    setActiveCategoryId(c.id);
+                  }}
+                />
+              ))}
+            </div>
           </div>
         )}
-      </main>
 
-      {/* Floating Bottom Cart Bar (Shown when items in cart) */}
+        {/* Active Category Heading */}
+        <div className="flex items-center justify-between mb-3 px-1">
+          <h2 className="text-[18px] sm:text-[20px] font-bold text-[var(--text)]">
+            {searchQuery.trim()
+              ? `Search results (${filteredItems.length})`
+              : categories.find((c) => c.id === activeCategoryId)?.name || 'Menu'}
+          </h2>
+          <span className="text-[13px] text-[var(--text-muted)] font-medium">
+            {filteredItems.length} {filteredItems.length === 1 ? 'item' : 'items'}
+          </span>
+        </div>
+
+        {/* Responsive Dishes Grid */}
+        <main>
+          {isLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
+              <MenuRowSkeleton />
+              <MenuRowSkeleton />
+              <MenuRowSkeleton />
+              <MenuRowSkeleton />
+            </div>
+          ) : filteredItems.length === 0 ? (
+            <div className="text-center py-16 text-[var(--text-muted)] text-[15px] warm-card p-8">
+              No dishes found matching your selection.
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
+              {filteredItems.map((item) => (
+                <MenuRow
+                  key={item.id}
+                  item={item}
+                  onAddToCart={handleAddToCart}
+                  onUpdateQuantity={(vId, qty) => handleUpdateQuantity(item.id, vId, qty)}
+                  getVariantQuantity={getVariantQuantity}
+                />
+              ))}
+            </div>
+          )}
+        </main>
+      </div>
+
+      {/* Floating Bottom Cart Bar (Shown on mobile & tablet when cart has items) */}
       {totalCount > 0 && (
-        <div className="fixed bottom-4 left-4 right-4 max-w-lg mx-auto z-40">
+        <div className="fixed bottom-22 md:bottom-6 left-4 right-4 max-w-md mx-auto z-40">
           <button
             type="button"
             onClick={() => setIsCartOpen(true)}
-            className="w-full h-13 bg-[var(--gold-ink)] text-[var(--gold-ink-contrast)] px-5 rounded-[3px] shadow-xl flex items-center justify-between font-medium tracking-wide active:scale-[0.99] transition-transform select-none"
+            className="w-full h-14 bg-[var(--nav)] text-[var(--on-nav)] dark:bg-[var(--accent)] dark:text-[var(--on-accent)] px-5 rounded-full shadow-xl flex items-center justify-between font-semibold active:scale-[0.98] transition-all select-none border border-[var(--border)]/20"
           >
-            <div className="flex items-center gap-2">
-              <span className="w-6 h-6 rounded-full bg-[var(--gold-ink-contrast)] text-[var(--gold-ink)] font-bold text-xs flex items-center justify-center">
+            <div className="flex items-center gap-2.5">
+              <span className="min-w-6 h-6 px-1.5 rounded-full bg-[var(--accent)] text-[var(--on-accent)] dark:bg-[var(--on-accent)] dark:text-[var(--accent)] font-bold text-[12px] flex items-center justify-center">
                 {totalCount}
               </span>
-              <span className="text-[14px] uppercase font-semibold">
-                {totalCount === 1 ? '1 item' : `${totalCount} items`}
+              <span className="text-[14px]">
+                {totalCount === 1 ? '1 item added' : `${totalCount} items added`}
               </span>
             </div>
 
-            <div className="flex items-center gap-2 font-serif text-[17px]">
-              <span>₹{(bill.total_paise / 100).toFixed(2)}</span>
-              <span className="text-sm">→</span>
+            <div className="flex items-center gap-2 text-[16px] tabular-nums">
+              <span>View Cart · ₹{(bill.total_paise / 100).toFixed(2)}</span>
             </div>
           </button>
         </div>

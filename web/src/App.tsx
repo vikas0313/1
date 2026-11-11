@@ -6,6 +6,7 @@ import { MenuPage } from './features/customer/MenuPage.js';
 import { PaymentPage } from './features/customer/PaymentPage.js';
 import { TrackingPage } from './features/customer/TrackingPage.js';
 import { BillPage } from './features/customer/BillPage.js';
+import { BottomNav, NavTab } from './components/BottomNav.js';
 
 // Owner Components
 import { OwnerAuthGuard } from './features/owner/OwnerAuthGuard.js';

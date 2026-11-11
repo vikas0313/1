@@ -3,7 +3,8 @@ import QRCode from 'qrcode';
 import type { Order, RestaurantSettings } from '@ritsu/shared';
 import { apiAdapter } from '../../data/ApiAdapter.js';
 import { Button } from '../../components/Button.js';
-import { ThemeToggle } from '../../components/ThemeToggle.js';
+import { TopBar } from '../../components/TopBar.js';
+import { Copy, Check, ArrowRight, FileText } from 'lucide-react';
 
 export interface PaymentPageProps {
   order: Order;
@@ -25,7 +26,6 @@ export const PaymentPage: React.FC<PaymentPageProps> = ({
       .getRestaurantSettings()
       .then((s) => {
         setSettings(s);
-        // Generate UPI payload
         const amountRupees = (order.total_paise / 100).toFixed(2);
         const upiUri = `upi://pay?pa=${encodeURIComponent(s.upi_vpa)}&pn=${encodeURIComponent(
           s.name
@@ -42,7 +42,7 @@ export const PaymentPage: React.FC<PaymentPageProps> = ({
           },
         }).then(setQrDataUrl);
       })
-      .catch(() => { });
+      .catch(() => {});
   }, [order]);
 
   const upiVpa = settings?.upi_vpa || 'ritsu@upi';
@@ -60,94 +60,107 @@ export const PaymentPage: React.FC<PaymentPageProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-[var(--bg-canvas)] p-6 max-w-lg mx-auto flex flex-col justify-between">
-      <header className="flex items-center justify-between pb-4 border-b border-[var(--border-hairline)]">
-        <div>
-          <span className="text-[12px] uppercase tracking-wider font-semibold text-[var(--gold-ink)]">
-            Order {order.order_no} · Table {order.table_label}
-          </span>
-          <h1 className="font-serif text-2xl font-bold text-[var(--text-primary)]">
-            Payment Options
-          </h1>
-        </div>
-        <ThemeToggle />
-      </header>
+    <div className="min-h-screen bg-[var(--bg)] flex flex-col justify-between">
+      <TopBar
+        title="Payment options"
+        subtitle={`Order #${order.order_no} · Table ${order.table_label}`}
+        tableLabel={order.table_label}
+      />
 
-      <main className="my-auto py-6 text-center space-y-6">
-        {/* Total Amount Banner */}
-        <div className="bg-[var(--bg-surface)] border border-[var(--border-hairline)] p-4 rounded-[2px]">
-          <div className="text-[12px] uppercase tracking-wider text-[var(--text-secondary)] font-medium">
-            Total Payable (Incl. 5% GST)
-          </div>
-          <div className="font-serif text-4xl font-bold text-[var(--gold-ink)] mt-1">
+      <main className="max-w-md w-full mx-auto px-4 py-6 flex-1 flex flex-col justify-center space-y-6">
+        {/* Total Amount Warm Card */}
+        <div className="warm-card p-6 text-center">
+          <span className="text-[13px] font-medium text-[var(--text-muted)]">
+            Total payable (includes 5% GST)
+          </span>
+          <div className="text-[36px] sm:text-[42px] font-bold tabular-nums text-[var(--text)] tracking-tight leading-tight mt-1 mb-1">
             ₹{amountRupees}
           </div>
+          <span className="text-[13px] font-semibold text-[var(--accent-ink)]">
+            Order confirmed · Pay via UPI or Cash
+          </span>
         </div>
 
-        {/* UPI QR Tile - Always dark QR on pure white */}
-        <div className="inline-block p-4 bg-white border border-[var(--border-hairline)] rounded-[4px] shadow-sm">
+        {/* UPI QR Tile - Strict white card with quiet zone */}
+        <div className="p-6 bg-white border border-[var(--border)] rounded-[24px] shadow-sm text-center">
           {qrDataUrl ? (
             <img
               src={qrDataUrl}
               alt="Scan to pay via UPI"
-              className="w-56 h-56 mx-auto block select-none"
+              className="w-56 h-56 mx-auto block select-none rounded-xl"
             />
           ) : (
-            <div className="w-56 h-56 flex items-center justify-center text-gray-400 text-sm">
-              Generating UPI QR...
+            <div className="w-56 h-56 flex items-center justify-center text-gray-400 text-sm mx-auto">
+              Generating UPI QR code...
             </div>
           )}
-          <p className="text-[11px] uppercase tracking-wider text-black font-semibold mt-2 select-none">
+          <p className="text-[13px] text-gray-800 font-semibold mt-3 select-none">
             Scan with GPay, PhonePe, Paytm, or BHIM
           </p>
-        </div>
 
-        {/* UPI ID Row */}
-        <div className="flex items-center justify-center gap-2 text-[13px]">
-          <span className="text-[var(--text-secondary)]">UPI ID:</span>
-          <code className="bg-[var(--bg-surface-elevated)] px-2 py-0.5 rounded border border-[var(--border-hairline)] font-mono text-[var(--text-primary)]">
-            {upiVpa}
-          </code>
-          <button
-            type="button"
-            onClick={handleCopyUPI}
-            className="text-[var(--gold-ink)] font-semibold hover:underline text-[12px] uppercase tracking-wider"
-          >
-            {copied ? 'Copied!' : 'Copy'}
-          </button>
+          {/* UPI ID Row */}
+          <div className="flex items-center justify-center gap-2 mt-3 pt-3 border-t border-gray-100 text-[13px]">
+            <span className="text-gray-500">UPI ID:</span>
+            <code className="bg-gray-100 px-2.5 py-1 rounded-full font-mono text-gray-800 font-medium">
+              {upiVpa}
+            </code>
+            <button
+              type="button"
+              onClick={handleCopyUPI}
+              className="touch-target inline-flex items-center gap-1 text-[var(--accent-ink)] font-semibold hover:underline px-2 py-1 text-[13px]"
+            >
+              {copied ? (
+                <>
+                  <Check className="w-3.5 h-3.5" />
+                  <span>Copied</span>
+                </>
+              ) : (
+                <>
+                  <Copy className="w-3.5 h-3.5" />
+                  <span>Copy</span>
+                </>
+              )}
+            </button>
+          </div>
         </div>
 
         {/* Action Buttons */}
-        <div className="space-y-3 pt-2">
-          {/* Deep link for mobile users */}
+        <div className="space-y-3">
           <a
             href={upiDeepLink}
-            className="w-full h-12 bg-[var(--gold-ink)] text-[var(--gold-ink-contrast)] rounded-[2px] font-medium uppercase tracking-wider text-[13px] inline-flex items-center justify-center shadow-sm hover:opacity-90 active:scale-[0.99] transition-all"
+            className="touch-target w-full h-12 bg-[var(--nav)] text-[var(--on-nav)] dark:bg-[var(--accent)] dark:text-[var(--on-accent)] rounded-full font-semibold text-[15px] inline-flex items-center justify-center shadow-sm hover:opacity-90 active:scale-[0.98] transition-all"
           >
-            Pay with UPI App
+            Pay with UPI app
           </a>
 
           <Button
             variant="secondary"
+            size="lg"
             className="w-full"
             onClick={onContinueToTracking}
           >
-            Pay at Counter / Cash & Track Order
+            <span>Pay cash at counter · Track order</span>
+            <ArrowRight className="w-4 h-4 ml-1.5" />
           </Button>
         </div>
 
-        {/* Disclaimer */}
-        <p className="text-[12px] text-[var(--text-secondary)] italic max-w-xs mx-auto leading-relaxed">
-          * Payment status is verified and confirmed at the restaurant counter.
+        <p className="text-[12px] text-[var(--text-muted)] text-center leading-relaxed">
+          Payment is verified and marked complete at the counter.
         </p>
       </main>
 
-      <footer className="text-center pt-4 border-t border-[var(--border-hairline)]">
-        <Button variant="tertiary" onClick={onViewBill}>
-          View / Print Detailed Bill →
-        </Button>
+      <footer className="text-center p-4 border-t border-[var(--border)] max-w-md w-full mx-auto">
+        <button
+          type="button"
+          onClick={onViewBill}
+          className="inline-flex items-center gap-2 text-[14px] font-semibold text-[var(--accent-ink)] hover:underline"
+        >
+          <FileText className="w-4 h-4" />
+          <span>View / Print detailed receipt</span>
+        </button>
       </footer>
     </div>
   );
 };
+
 

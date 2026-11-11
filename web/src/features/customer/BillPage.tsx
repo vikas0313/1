@@ -3,7 +3,8 @@ import type { Order, RestaurantSettings } from '@ritsu/shared';
 import { apiAdapter } from '../../data/ApiAdapter.js';
 import { Button } from '../../components/Button.js';
 import { Badge } from '../../components/Badge.js';
-import { ThemeToggle } from '../../components/ThemeToggle.js';
+import { TopBar } from '../../components/TopBar.js';
+import { Printer, Share2, ArrowLeft, UtensilsCrossed, Check } from 'lucide-react';
 
 export interface BillPageProps {
   order: Order;
@@ -45,7 +46,6 @@ export const BillPage: React.FC<BillPageProps> = ({
     }
   };
 
-  // Formatted date in Asia/Kolkata time
   const orderDate = new Date(order.created_at).toLocaleString('en-IN', {
     timeZone: 'Asia/Kolkata',
     day: '2-digit',
@@ -57,151 +57,166 @@ export const BillPage: React.FC<BillPageProps> = ({
   });
 
   return (
-    <div className="min-h-screen bg-[var(--bg-canvas)] p-4 sm:p-6 max-w-lg mx-auto">
-      {/* Top Action Bar (hidden in print) */}
-      <div className="no-print flex items-center justify-between pb-4 mb-4 border-b border-[var(--border-hairline)]">
-        <Button variant="secondary" onClick={onBackToTracking} className="h-9 px-3 text-[12px]">
-          ← Back to Tracker
-        </Button>
-        <div className="flex items-center gap-2">
-          <ThemeToggle />
-        </div>
-      </div>
+    <div className="min-h-screen bg-[var(--bg)] pb-12">
+      <TopBar
+        title="Tax receipt"
+        subtitle={`Order #${order.order_no} · Table ${order.table_label}`}
+        tableLabel={order.table_label}
+        showBack
+        onBack={onBackToTracking}
+      />
 
-      {/* Bill Receipt Card (Black on white in print mode) */}
-      <div className="bg-[var(--bg-surface)] border border-[var(--border-hairline)] p-6 rounded-[2px] shadow-sm print:border-none print:shadow-none print:p-0">
-        {/* Header */}
-        <div className="text-center pb-4 border-b border-dashed border-[var(--border-hairline)]">
-          <h1 className="font-serif text-2xl font-bold tracking-tight text-[var(--text-primary)]">
-            {settings?.name || 'Ritsu Food Corner'}
-          </h1>
-          <p className="text-[12px] italic text-[var(--gold-ink)]">
-            {settings?.tagline || 'Indo-Chinese ka asli maza – Ritsu ke saath!'}
-          </p>
-          <p className="text-[12px] text-[var(--text-secondary)] mt-1">
-            {settings?.address || 'Main Road, Food Street, India'}
-          </p>
-          <p className="text-[12px] text-[var(--text-secondary)]">
-            GSTIN: <span className="font-mono">{settings?.gstin || '36ABCDE1234F1Z5'}</span> · Tel:{' '}
-            {settings?.phone || '+91 98765 43210'}
-          </p>
-        </div>
+      <div className="max-w-lg mx-auto p-4 sm:p-6">
+        {/* Bill Receipt Warm Card (Pure black on white when printed) */}
+        <div className="warm-card p-6 sm:p-8 bg-[var(--surface)] text-[var(--text)] print:border-none print:shadow-none print:p-0 print:bg-white print:text-black">
+          {/* Restaurant Header */}
+          <div className="text-center pb-5 border-b border-dashed border-[var(--border)]">
+            <h1 className="text-[22px] sm:text-[24px] font-bold tracking-tight text-[var(--text)] print:text-black">
+              {settings?.name || 'Ritsu Food Corner'}
+            </h1>
+            <p className="text-[13px] text-[var(--accent-ink)] font-medium mt-0.5 print:text-gray-700">
+              {settings?.tagline || 'Indo-Chinese street kitchen'}
+            </p>
+            <p className="text-[12px] text-[var(--text-muted)] mt-1.5 print:text-gray-600">
+              {settings?.address || 'Main Road, Food Street, India'}
+            </p>
+            <p className="text-[12px] text-[var(--text-muted)] mt-0.5 print:text-gray-600">
+              GSTIN: <span className="font-mono">{settings?.gstin || '36ABCDE1234F1Z5'}</span> · Tel:{' '}
+              {settings?.phone || '+91 98765 43210'}
+            </p>
+          </div>
 
-        {/* Order Meta */}
-        <div className="py-3 border-b border-dashed border-[var(--border-hairline)] text-[13px] flex justify-between">
-          <div>
+          {/* Order Metadata */}
+          <div className="py-4 border-b border-dashed border-[var(--border)] text-[13px] flex justify-between gap-4">
             <div>
-              <span className="text-[var(--text-secondary)]">Order No: </span>
-              <strong className="text-[var(--text-primary)]">{order.order_no}</strong>
+              <div>
+                <span className="text-[var(--text-muted)] print:text-gray-600">Order: </span>
+                <strong className="text-[var(--text)] font-bold print:text-black">#{order.order_no}</strong>
+              </div>
+              <div className="mt-0.5">
+                <span className="text-[var(--text-muted)] print:text-gray-600">Customer: </span>
+                <span className="text-[var(--text)] font-semibold print:text-black">{order.customer_name}</span>
+              </div>
             </div>
-            <div>
-              <span className="text-[var(--text-secondary)]">Customer: </span>
-              <span className="text-[var(--text-primary)]">{order.customer_name}</span>
+            <div className="text-right">
+              <div>
+                <span className="text-[var(--text-muted)] print:text-gray-600">Table: </span>
+                <strong className="text-[var(--accent-ink)] font-bold print:text-black">{order.table_label}</strong>
+              </div>
+              <div className="text-[11px] text-[var(--text-muted)] mt-0.5 print:text-gray-600">{orderDate}</div>
             </div>
           </div>
-          <div className="text-right">
-            <div>
-              <span className="text-[var(--text-secondary)]">Table: </span>
-              <strong className="text-[var(--gold-ink)]">{order.table_label}</strong>
-            </div>
-            <div className="text-[11px] text-[var(--text-tertiary)]">{orderDate}</div>
-          </div>
-        </div>
 
-        {/* Items Table */}
-        <div className="py-4 border-b border-dashed border-[var(--border-hairline)]">
-          <table className="w-full text-left text-[13px]">
-            <thead>
-              <tr className="text-[11px] uppercase tracking-wider text-[var(--text-secondary)] border-b border-[var(--border-hairline)]">
-                <th className="pb-1.5">Item</th>
-                <th className="pb-1.5 text-center">Qty</th>
-                <th className="pb-1.5 text-right">Price</th>
-                <th className="pb-1.5 text-right">Amount</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[var(--border-hairline)]">
-              {order.items.map((line) => (
-                <tr key={line.id} className="py-2">
-                  <td className="py-2 pr-2">
-                    <div className="font-medium text-[var(--text-primary)]">
-                      {line.name_snapshot}
-                    </div>
-                    <div className="text-[11px] text-[var(--text-secondary)]">
-                      {line.variant_label_snapshot}
-                    </div>
-                  </td>
-                  <td className="py-2 text-center tabular-nums">{line.quantity}</td>
-                  <td className="py-2 text-right font-serif tabular-nums text-[var(--text-secondary)]">
-                    ₹{line.unit_price_paise / 100}
-                  </td>
-                  <td className="py-2 text-right font-serif tabular-nums font-semibold text-[var(--text-primary)]">
-                    ₹{(line.unit_price_paise * line.quantity) / 100}
-                  </td>
+          {/* Items Table */}
+          <div className="py-4 border-b border-dashed border-[var(--border)]">
+            <table className="w-full text-left text-[13px]">
+              <thead>
+                <tr className="text-[12px] font-semibold text-[var(--text-muted)] border-b border-[var(--border)] print:text-gray-700">
+                  <th className="pb-2">Item</th>
+                  <th className="pb-2 text-center">Qty</th>
+                  <th className="pb-2 text-right">Price</th>
+                  <th className="pb-2 text-right">Amount</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-[var(--border)]/50">
+                {order.items.map((line) => (
+                  <tr key={line.id}>
+                    <td className="py-2.5 pr-2">
+                      <div className="font-semibold text-[var(--text)] print:text-black">
+                        {line.name_snapshot}
+                      </div>
+                      <div className="text-[11px] text-[var(--text-muted)] print:text-gray-600">
+                        {line.variant_label_snapshot}
+                      </div>
+                    </td>
+                    <td className="py-2.5 text-center tabular-nums font-medium">{line.quantity}</td>
+                    <td className="py-2.5 text-right tabular-nums text-[var(--text-muted)] print:text-gray-600">
+                      ₹{line.unit_price_paise / 100}
+                    </td>
+                    <td className="py-2.5 text-right tabular-nums font-semibold text-[var(--text)] print:text-black">
+                      ₹{(line.unit_price_paise * line.quantity) / 100}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Tax Breakdown */}
+          <div className="py-4 border-b border-dashed border-[var(--border)] space-y-1.5 text-[13px] text-[var(--text-muted)] print:text-gray-700">
+            <div className="flex justify-between">
+              <span>Subtotal</span>
+              <span className="tabular-nums font-semibold text-[var(--text)] print:text-black">
+                ₹{(order.subtotal_paise / 100).toFixed(2)}
+              </span>
+            </div>
+            <div className="flex justify-between text-[12px]">
+              <span>CGST (2.5%)</span>
+              <span className="tabular-nums">
+                ₹{(order.cgst_paise / 100).toFixed(2)}
+              </span>
+            </div>
+            <div className="flex justify-between text-[12px]">
+              <span>SGST (2.5%)</span>
+              <span className="tabular-nums">
+                ₹{(order.sgst_paise / 100).toFixed(2)}
+              </span>
+            </div>
+            <div className="flex justify-between text-[18px] font-bold text-[var(--text)] pt-2 border-t border-[var(--border)] print:text-black">
+              <span>Total amount</span>
+              <span className="tabular-nums text-[var(--accent-ink)] print:text-black">
+                ₹{(order.total_paise / 100).toFixed(2)}
+              </span>
+            </div>
+          </div>
+
+          {/* Payment Status */}
+          <div className="pt-4 flex items-center justify-between text-[13px]">
+            <span className="text-[var(--text-muted)] print:text-gray-600">Payment status:</span>
+            <Badge
+              variant="status"
+              status={order.payment_status === 'paid' ? 'complete' : 'pending'}
+            >
+              {order.payment_status === 'paid' ? 'Paid' : 'Unpaid · Pay at counter'}
+            </Badge>
+          </div>
+
+          <div className="text-center pt-6 text-[12px] text-[var(--text-muted)] print:text-gray-600 leading-relaxed">
+            Thank you for dining at Ritsu Food Corner! Please visit again.
+          </div>
         </div>
 
-        {/* Totals */}
-        <div className="py-3 border-b border-dashed border-[var(--border-hairline)] space-y-1.5 text-[13px] text-[var(--text-secondary)]">
-          <div className="flex justify-between">
-            <span>Subtotal</span>
-            <span className="font-serif tabular-nums text-[var(--text-primary)]">
-              ₹{(order.subtotal_paise / 100).toFixed(2)}
-            </span>
-          </div>
-          <div className="flex justify-between text-[12px]">
-            <span>CGST (2.5%)</span>
-            <span className="font-serif tabular-nums">
-              ₹{(order.cgst_paise / 100).toFixed(2)}
-            </span>
-          </div>
-          <div className="flex justify-between text-[12px]">
-            <span>SGST (2.5%)</span>
-            <span className="font-serif tabular-nums">
-              ₹{(order.sgst_paise / 100).toFixed(2)}
-            </span>
-          </div>
-          <div className="flex justify-between font-serif text-[18px] font-bold text-[var(--text-primary)] pt-1 border-t border-[var(--border-hairline)]">
-            <span>Total Payable</span>
-            <span className="tabular-nums text-[var(--gold-ink)]">
-              ₹{(order.total_paise / 100).toFixed(2)}
-            </span>
-          </div>
-        </div>
-
-        {/* Payment Status Footer */}
-        <div className="pt-4 flex items-center justify-between text-[12px]">
-          <span className="text-[var(--text-secondary)]">Payment Status:</span>
-          <Badge
-            variant="status"
-            status={order.payment_status === 'paid' ? 'complete' : 'pending'}
-          >
-            {order.payment_status === 'paid' ? 'PAID' : 'UNPAID / CASH AT COUNTER'}
-          </Badge>
-        </div>
-
-        <div className="text-center pt-6 text-[12px] text-[var(--text-secondary)] italic">
-          Thank you for dining with us! Please visit again.
-        </div>
-      </div>
-
-      {/* Buttons (hidden during printing) */}
-      <div className="no-print mt-6 space-y-3">
-        <Button variant="primary" className="w-full" onClick={handlePrint}>
-          🖨️ Print / Save Receipt (PDF)
-        </Button>
-        <div className="flex gap-2">
-          <Button variant="secondary" className="flex-1" onClick={handleShare}>
-            {copied ? 'Link Copied!' : '📤 Share Receipt Link'}
+        {/* Action Buttons (Hidden when printing) */}
+        <div className="no-print mt-6 space-y-3">
+          <Button variant="primary" size="lg" className="w-full" onClick={handlePrint}>
+            <Printer className="w-4 h-4 mr-2" />
+            <span>Print or save receipt (PDF)</span>
           </Button>
-          <Button variant="secondary" className="flex-1" onClick={onBackToMenu}>
-            🍽️ Back to Menu
-          </Button>
+
+          <div className="flex gap-3">
+            <Button variant="secondary" size="md" className="flex-1" onClick={handleShare}>
+              {copied ? (
+                <>
+                  <Check className="w-4 h-4 mr-1.5 text-[var(--success)]" />
+                  <span>Link copied</span>
+                </>
+              ) : (
+                <>
+                  <Share2 className="w-4 h-4 mr-1.5 text-[var(--accent-ink)]" />
+                  <span>Share link</span>
+                </>
+              )}
+            </Button>
+
+            <Button variant="secondary" size="md" className="flex-1" onClick={onBackToMenu}>
+              <UtensilsCrossed className="w-4 h-4 mr-1.5 text-[var(--accent-ink)]" />
+              <span>Back to menu</span>
+            </Button>
+          </div>
         </div>
       </div>
     </div>
   );
 };
+
 
