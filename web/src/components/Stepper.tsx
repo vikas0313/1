@@ -1,4 +1,5 @@
 import React from 'react';
+import { Minus, Plus } from 'lucide-react';
 
 export interface StepperProps {
   value: number;
@@ -6,6 +7,7 @@ export interface StepperProps {
   max?: number;
   onChange: (newValue: number) => void;
   className?: string;
+  size?: 'md' | 'sm';
 }
 
 export const Stepper: React.FC<StepperProps> = ({
@@ -14,6 +16,7 @@ export const Stepper: React.FC<StepperProps> = ({
   max = 20,
   onChange,
   className = '',
+  size = 'md',
 }) => {
   const handleDecrement = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -31,20 +34,24 @@ export const Stepper: React.FC<StepperProps> = ({
     }
   };
 
+  const isSmall = size === 'sm';
+  const containerHeight = isSmall ? 'h-9' : 'h-11';
+  const btnSize = isSmall ? 'w-9 h-9' : 'w-11 h-11';
+
   return (
     <div
-      className={`inline-flex items-center border border-[var(--border-hairline)] bg-[var(--bg-surface)] rounded-[2px] h-9 select-none ${className}`}
+      className={`inline-flex items-center bg-[var(--surface-2)] border border-[var(--border)] rounded-full select-none ${containerHeight} ${className}`}
     >
       <button
         type="button"
         aria-label="Decrease quantity"
         onClick={handleDecrement}
-        className="w-9 h-full flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--gold-ink)] hover:bg-[var(--bg-surface-elevated)] transition-colors text-base"
+        className={`${btnSize} flex items-center justify-center text-[var(--text)] hover:bg-[var(--surface)] active:scale-[0.92] rounded-full transition-all`}
       >
-        −
+        <Minus className={isSmall ? "w-3.5 h-3.5" : "w-4 h-4"} />
       </button>
 
-      <span className="w-8 text-center text-[14px] font-semibold text-[var(--text-primary)]">
+      <span className="w-8 text-center text-[15px] tabular-nums font-semibold text-[var(--text)]">
         {value}
       </span>
 
@@ -53,11 +60,12 @@ export const Stepper: React.FC<StepperProps> = ({
         aria-label="Increase quantity"
         onClick={handleIncrement}
         disabled={value >= max}
-        className="w-9 h-full flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--gold-ink)] hover:bg-[var(--bg-surface-elevated)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors text-base"
+        className={`${btnSize} flex items-center justify-center text-[var(--text)] hover:bg-[var(--surface)] disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.92] rounded-full transition-all`}
       >
-        +
+        <Plus className={isSmall ? "w-3.5 h-3.5" : "w-4 h-4"} />
       </button>
     </div>
   );
 };
+
 

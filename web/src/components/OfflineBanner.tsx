@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { WifiOff } from 'lucide-react';
 
 export const OfflineBanner: React.FC = () => {
   const [isOffline, setIsOffline] = useState(!navigator.onLine);
@@ -21,10 +22,12 @@ export const OfflineBanner: React.FC = () => {
   return (
     <div
       role="alert"
-      className="w-full bg-amber-500/10 border-b-2 border-[var(--border-gold)] text-[var(--gold-ink)] py-2.5 px-4 text-center text-[13px] font-medium tracking-wide uppercase shadow-sm select-none"
+      className="w-full bg-amber-500/15 border-b border-[var(--warning)]/30 text-[var(--warning)] py-2.5 px-4 text-center text-[13px] font-medium flex items-center justify-center gap-2 select-none"
     >
-      ⚠️ No internet connection. Ordering is paused. Please check your network.
+      <WifiOff className="w-4 h-4 shrink-0" />
+      <span>No internet connection. Reconnecting automatically...</span>
     </div>
   );
 };
+
 

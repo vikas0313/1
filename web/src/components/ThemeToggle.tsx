@@ -1,20 +1,28 @@
 import React, { useEffect, useState } from 'react';
+import { Sun, Moon, Monitor } from 'lucide-react';
 
 export interface ThemeToggleProps {
   isOwner?: boolean;
+  className?: string;
+  showLabel?: boolean;
 }
 
 export type ThemeMode = 'light' | 'dark' | 'system';
 
-export const ThemeToggle: React.FC<ThemeToggleProps> = ({ isOwner = false }) => {
+export const ThemeToggle: React.FC<ThemeToggleProps> = ({
+  isOwner = false,
+  className = '',
+  showLabel = false,
+}) => {
   const storageKey = isOwner ? 'ritsu-theme-owner' : 'ritsu-theme-customer';
-  const [mode, setMode] = useState<ThemeMode>('light');
+  const defaultMode: ThemeMode = isOwner ? 'light' : 'system';
+  const [mode, setMode] = useState<ThemeMode>(defaultMode);
 
   useEffect(() => {
-    const stored = (localStorage.getItem(storageKey) as ThemeMode) || 'system';
+    const stored = (localStorage.getItem(storageKey) as ThemeMode) || defaultMode;
     setMode(stored);
     applyTheme(stored);
-  }, [storageKey]);
+  }, [storageKey, defaultMode]);
 
   const applyTheme = (targetMode: ThemeMode) => {
     let effectiveTheme: 'light' | 'dark' = 'light';
@@ -26,6 +34,12 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({ isOwner = false }) => 
 
     document.documentElement.setAttribute('data-theme', effectiveTheme);
     document.documentElement.style.colorScheme = effectiveTheme;
+
+    // Update theme-color meta tag
+    const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+    if (metaThemeColor) {
+      metaThemeColor.setAttribute('content', effectiveTheme === 'dark' ? '#171514' : '#F3EFE7');
+    }
   };
 
   const cycleTheme = () => {
@@ -39,17 +53,32 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({ isOwner = false }) => 
     applyTheme(next);
   };
 
-  const displayText = mode === 'system' ? 'SYSTEM' : mode === 'dark' ? 'DARK' : 'LIGHT';
+  const getLabel = () => {
+    if (mode === 'system') return 'System';
+    if (mode === 'dark') return 'Dark';
+    return 'Light';
+  };
+
+  const renderIcon = () => {
+    if (mode === 'dark') return <Moon className="w-4 h-4 text-[var(--accent)]" />;
+    if (mode === 'light') return <Sun className="w-4 h-4 text-[var(--accent-ink)]" />;
+    return <Monitor className="w-4 h-4 text-[var(--text-muted)]" />;
+  };
 
   return (
     <button
       type="button"
       onClick={cycleTheme}
-      className="text-[12px] uppercase tracking-wider font-semibold text-[var(--gold-ink)] hover:underline px-2 py-1 select-none focus:outline-none"
-      title="Click to toggle theme: Light / Dark / System"
+      className={`touch-target inline-flex items-center justify-center gap-2 rounded-[16px] bg-[var(--surface)] border border-[var(--border)] text-[var(--text)] hover:border-[var(--accent)]/50 active:scale-[0.97] transition-all p-2.5 shadow-xs select-none ${className}`}
+      title={`Theme: ${getLabel()} (Click to toggle)`}
+      aria-label={`Current theme is ${getLabel()}. Click to toggle between Light, Dark, and System.`}
     >
-      THEME: {displayText}
+      {renderIcon()}
+      {showLabel && (
+        <span className="text-[13px] font-medium text-[var(--text)]">{getLabel()}</span>
+      )}
     </button>
   );
 };
+
 

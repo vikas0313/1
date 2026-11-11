@@ -3,24 +3,27 @@ import React from 'react';
 export const Skeleton: React.FC<{ className?: string }> = ({ className = '' }) => {
   return (
     <div
-      className={`animate-pulse bg-[var(--bg-surface-elevated)] border border-[var(--border-hairline)] rounded-[2px] ${className}`}
+      className={`animate-pulse bg-[var(--surface-2)] rounded-xl ${className}`}
     />
   );
 };
 
 export const MenuRowSkeleton: React.FC = () => {
   return (
-    <div className="py-4 border-b border-[var(--border-hairline)] flex items-center justify-between gap-4">
+    <div className="p-4 bg-[var(--surface)] border border-[var(--border)] rounded-[24px] flex items-center justify-between gap-4 mb-3">
+      <div className="flex items-center gap-3">
+        <Skeleton className="w-12 h-12 rounded-full shrink-0" />
+        <div className="space-y-2">
+          <Skeleton className="w-32 h-4" />
+          <Skeleton className="w-20 h-3" />
+        </div>
+      </div>
       <div className="flex items-center gap-2">
-        <Skeleton className="w-6 h-4" />
-        <Skeleton className="w-2.5 h-2.5 rounded-full" />
+        <Skeleton className="w-14 h-8 rounded-full" />
+        <Skeleton className="w-20 h-10 rounded-full" />
       </div>
-      <div className="flex-1 space-y-2">
-        <Skeleton className="w-3/5 h-4" />
-        <Skeleton className="w-2/5 h-3" />
-      </div>
-      <Skeleton className="w-16 h-8" />
     </div>
   );
 };
+
 

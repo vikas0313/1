@@ -69,60 +69,63 @@ export const AlertBanner: React.FC<AlertBannerProps> = ({ onUnlock }) => {
     return (
       <div
         onClick={handleUnlockClick}
-        className="w-full bg-[var(--gold-ink)] text-[var(--bg-canvas)] px-4 py-2.5 flex items-center justify-between cursor-pointer select-none transition-all duration-200 hover:brightness-105 shadow-md"
+        className="mx-3 my-2 bg-[var(--accent)] text-[var(--on-accent)] px-4 py-3 rounded-2xl flex items-center justify-between cursor-pointer select-none transition-all duration-150 hover:opacity-95 shadow-sm"
         role="button"
         tabIndex={0}
         aria-label="Tap to enable sound alerts for new orders"
       >
-        <div className="flex items-center gap-2.5 font-medium text-xs sm:text-sm">
-          <Bell className="w-4 h-4 animate-bounce" />
-          <span>Tap to enable sound alerts for new orders (browser audio requirement)</span>
+        <div className="flex items-center gap-2.5 font-medium text-[13px] sm:text-[14px]">
+          <Bell className="w-4 h-4 shrink-0" />
+          <span>Tap to enable order sound alerts</span>
         </div>
-        <span className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider underline underline-offset-2">
-          Enable Audio
+        <span className="text-[12px] font-bold bg-[var(--on-accent)] text-[var(--accent)] px-3 py-1 rounded-full shadow-xs">
+          Enable
         </span>
       </div>
     );
   }
 
   return (
-    <div className="w-full bg-[var(--bg-surface)] border-b border-[var(--border-subtle)] px-4 py-2 text-xs flex flex-wrap items-center justify-between gap-3 text-[var(--text-secondary)]">
-      <div className="flex items-center gap-2">
-        <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-          Sound Active
+    <div className="w-full bg-[var(--surface)] border-b border-[var(--border)] px-4 py-2.5 text-[13px] flex flex-wrap items-center justify-between gap-3 text-[var(--text-muted)]">
+      <div className="flex items-center gap-2.5">
+        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[12px] font-medium bg-emerald-50 text-[var(--success)] dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800">
+          <span className="w-1.5 h-1.5 rounded-full bg-[var(--success)] animate-pulse" />
+          Sound active
         </span>
 
         <button
+          type="button"
           onClick={handleToggleMute}
-          className="p-1 rounded hover:bg-[var(--bg-card)] text-[var(--text-primary)] transition-colors inline-flex items-center gap-1"
-          title={settings.muted ? 'Unmute Audio' : 'Mute Audio'}
+          className="px-2.5 py-1 rounded-full border border-[var(--border)] hover:bg-[var(--surface-2)] text-[var(--text)] transition-colors inline-flex items-center gap-1.5 text-[12px]"
+          title={settings.muted ? 'Unmute audio' : 'Mute audio'}
         >
-          {settings.muted ? <VolumeX className="w-4 h-4 text-red-500" /> : <Volume2 className="w-4 h-4 text-[var(--gold-ink)]" />}
-          <span>{settings.muted ? 'Muted' : 'Unmuted'}</span>
+          {settings.muted ? <VolumeX className="w-3.5 h-3.5 text-[var(--danger)]" /> : <Volume2 className="w-3.5 h-3.5 text-[var(--accent-ink)]" />}
+          <span>{settings.muted ? 'Muted' : 'Sound on'}</span>
         </button>
 
         <button
+          type="button"
           onClick={() => setShowConfig(!showConfig)}
-          className="text-[11px] underline text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+          className="text-[12px] text-[var(--accent-ink)] hover:underline"
         >
-          {showConfig ? 'Hide sound settings' : 'Audio settings'}
+          {showConfig ? 'Hide settings' : 'Settings'}
         </button>
       </div>
 
       <div className="flex items-center gap-2">
         <button
+          type="button"
           onClick={handleTestAlert}
-          className="px-2.5 py-1 text-[11px] rounded border border-[var(--border-default)] hover:border-[var(--gold-ink)] hover:text-[var(--gold-ink)] transition-colors"
+          className="px-3 py-1 text-[12px] font-medium rounded-full bg-[var(--surface-2)] text-[var(--text)] border border-[var(--border)] hover:border-[var(--accent)]/50 transition-colors"
         >
-          Test Alert
+          Test alert
         </button>
       </div>
 
       {showConfig && (
-        <div className="w-full pt-2 pb-1 flex flex-wrap items-center gap-4 border-t border-[var(--border-subtle)] mt-1">
+        <div className="w-full pt-2.5 pb-1 flex flex-wrap items-center gap-4 border-t border-[var(--border)] mt-1">
           <div className="flex items-center gap-2">
-            <label className="text-[11px] font-medium text-[var(--text-secondary)]">Volume:</label>
+            <label className="text-[12px] font-medium text-[var(--text)]">Volume:</label>
             <input
               type="range"
               min="0"
@@ -130,18 +133,18 @@ export const AlertBanner: React.FC<AlertBannerProps> = ({ onUnlock }) => {
               step="0.05"
               value={settings.volume}
               onChange={handleVolumeChange}
-              className="w-20 accent-[var(--gold-ink)]"
+              className="w-20 accent-[var(--accent)]"
             />
-            <span className="text-[10px] w-6 text-right">{Math.round(settings.volume * 100)}%</span>
+            <span className="text-[12px] tabular-nums w-8 text-right text-[var(--text)]">{Math.round(settings.volume * 100)}%</span>
           </div>
 
           {voices.length > 0 && (
             <div className="flex items-center gap-2">
-              <label className="text-[11px] font-medium text-[var(--text-secondary)]">Voice:</label>
+              <label className="text-[12px] font-medium text-[var(--text)]">Voice:</label>
               <select
                 value={settings.voiceURI || ''}
                 onChange={handleVoiceChange}
-                className="text-[11px] bg-[var(--bg-canvas)] border border-[var(--border-default)] rounded px-2 py-0.5 text-[var(--text-primary)]"
+                className="text-[12px] bg-[var(--surface-2)] border border-[var(--border)] rounded-full px-3 py-1 text-[var(--text)]"
               >
                 <option value="">Default voice</option>
                 {voices.map((v) => (

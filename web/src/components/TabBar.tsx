@@ -31,7 +31,7 @@ export const TabBar: React.FC<TabBarProps> = ({
       role="tablist"
       aria-label="Categories"
       ref={containerRef}
-      className={`flex items-center gap-1 overflow-x-auto no-scrollbar border-b border-[var(--border-hairline)] bg-[var(--bg-canvas)] sticky top-0 z-20 py-1 px-4 ${className}`}
+      className={`flex items-center gap-2 overflow-x-auto no-scrollbar border-b border-[var(--border)] bg-[var(--bg)]/95 backdrop-blur-md sticky top-0 z-20 py-2.5 px-4 ${className}`}
     >
       {tabs.map((tab) => {
         const isActive = tab.id === activeTabId;
@@ -42,20 +42,21 @@ export const TabBar: React.FC<TabBarProps> = ({
             aria-selected={isActive}
             tabIndex={isActive ? 0 : -1}
             onClick={(e) => handleTabClick(tab.id, e)}
-            className={`whitespace-nowrap px-3.5 py-2.5 text-[13px] uppercase tracking-wider font-medium transition-all relative shrink-0 select-none ${
+            className={`touch-target whitespace-nowrap px-4 py-2 text-[14px] font-medium rounded-full transition-all relative shrink-0 select-none ${
               isActive
-                ? 'text-[var(--gold-ink)] font-semibold'
-                : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                ? 'bg-[var(--accent)] text-[var(--on-accent)] font-bold shadow-xs'
+                : 'bg-[var(--surface)] border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text)] hover:border-[var(--accent)]/40'
             }`}
           >
             <span>{tab.label}</span>
             {tab.badge !== undefined && (
-              <span className="ml-1.5 text-[10px] px-1.5 py-0.2 rounded-full bg-[var(--bg-surface-elevated)] border border-[var(--border-hairline)] text-[var(--text-tertiary)]">
+              <span className={`ml-1.5 text-[11px] px-2 py-0.5 rounded-full ${
+                isActive
+                  ? 'bg-[var(--on-accent)] text-[var(--accent)]'
+                  : 'bg-[var(--surface-2)] text-[var(--text-muted)]'
+              }`}>
                 {tab.badge}
               </span>
-            )}
-            {isActive && (
-              <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-[var(--border-gold)] transition-all" />
             )}
           </button>
         );

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import type { MenuItem, MenuItemVariant } from '@ritsu/shared';
 import { SizeLabel } from './SizeLabel.js';
 import { Stepper } from './Stepper.js';
-import { Button } from './Button.js';
+import { Plus, Utensils } from 'lucide-react';
 
 export interface MenuRowProps {
   item: MenuItem;
@@ -33,50 +33,48 @@ export const MenuRow: React.FC<MenuRowProps> = ({
     ? getVariantQuantity(activeVariant?.id || '')
     : 0;
 
-  const itemNoStr = item.item_no < 10 ? `0${item.item_no}` : `${item.item_no}`;
+  const priceRupees = activeVariant ? activeVariant.price_paise / 100 : 0;
 
   return (
     <article
-      className={`py-3.5 border-b border-[var(--border-hairline)] transition-opacity ${
+      className={`warm-card p-4 transition-all duration-150 ${
         !isAvailable ? 'opacity-40 grayscale-[40%]' : ''
       }`}
     >
-      <div className="flex items-start justify-between gap-2">
-        {/* Left: Item Number & Veg/Non-Veg dot */}
-        <div className="flex items-center gap-2 pt-0.5 shrink-0">
-          <span className="font-serif text-[15px] font-medium text-[var(--text-tertiary)] w-6 text-right select-none">
-            {itemNoStr}.
-          </span>
+      <div className="flex items-start gap-3.5">
+        {/* Round thumbnail with dish indicator */}
+        <div className="w-12 h-12 rounded-full bg-[var(--surface-2)] border border-[var(--border)] flex items-center justify-center shrink-0 relative">
+          <Utensils className="w-5 h-5 text-[var(--text-muted)]" />
           <span
-            className={`w-2.5 h-2.5 rounded-full shrink-0 ${
-              item.is_veg ? 'bg-[var(--veg-dot)]' : 'bg-[var(--non-veg-dot)]'
+            className={`absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full border-2 border-[var(--surface)] ${
+              item.is_veg ? 'bg-[var(--veg)]' : 'bg-[var(--nonveg)]'
             }`}
             title={item.is_veg ? 'Vegetarian' : 'Non-Vegetarian'}
           />
         </div>
 
-        {/* Middle: Dish Name, Popular Tag, Description */}
-        <div className="flex-1 min-w-0 pr-2">
+        {/* Dish Name, description, popular badge */}
+        <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <h3 className="text-[15px] sm:text-[16px] font-medium text-[var(--text-primary)] leading-tight">
+            <h3 className="text-[16px] font-bold text-[var(--text)] leading-snug">
               {item.name}
             </h3>
             {item.is_popular && (
-              <span className="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded-[2px] bg-[var(--bg-surface-elevated)] text-[var(--gold-ink)] border border-[var(--border-gold)]">
-                POPULAR
+              <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-[var(--accent)]/15 text-[var(--accent-ink)] border border-[var(--accent)]/30">
+                Popular
               </span>
             )}
           </div>
 
           {item.description ? (
-            <p className="text-[13px] text-[var(--text-secondary)] mt-0.5 line-clamp-2">
+            <p className="text-[13px] text-[var(--text-muted)] mt-1 line-clamp-2 leading-relaxed">
               {item.description}
             </p>
           ) : null}
 
-          {/* Size Selectors (if 2 variants e.g. Single / Full) */}
+          {/* Size Selectors (e.g. Single / Full) */}
           {hasMultipleVariants && isAvailable && (
-            <div className="flex items-center gap-2 mt-2 flex-wrap">
+            <div className="flex items-center gap-2 mt-2.5 flex-wrap">
               {item.variants.map((v) => (
                 <SizeLabel
                   key={v.id}
@@ -91,46 +89,49 @@ export const MenuRow: React.FC<MenuRowProps> = ({
           )}
         </div>
 
-        {/* Dotted Leader */}
-        <div className="hidden sm:block menu-leader" />
-
-        {/* Right: Price & Add / Stepper Action */}
-        <div className="flex flex-col items-end gap-1.5 shrink-0">
-          {!hasMultipleVariants && activeVariant && (
-            <span className="font-serif text-[17px] sm:text-[18px] font-semibold text-[var(--text-primary)] tabular-nums">
-              ₹{activeVariant.price_paise / 100}
+        {/* Right: Big Bold Price figure and Add / Stepper action */}
+        <div className="flex flex-col items-end justify-between self-stretch shrink-0 gap-2">
+          <div className="text-right">
+            <span className="text-[18px] sm:text-[20px] font-bold tabular-nums text-[var(--text)]">
+              ₹{priceRupees}
             </span>
-          )}
+          </div>
 
-          {!isAvailable ? (
-            <span className="text-[12px] uppercase font-medium text-[var(--text-tertiary)] italic">
-              Not available
-            </span>
-          ) : currentVariantQty > 0 ? (
-            <Stepper
-              value={currentVariantQty}
-              onChange={(newQty) => {
-                if (activeVariant) {
-                  onUpdateQuantity(activeVariant.id, newQty);
-                }
-              }}
-            />
-          ) : (
-            <Button
-              variant="secondary"
-              onClick={() => {
-                if (activeVariant) {
-                  onAddToCart(activeVariant, 1);
-                }
-              }}
-              className="h-8 px-3 text-[12px] font-medium"
-            >
-              + ADD
-            </Button>
-          )}
+          <div>
+            {!isAvailable ? (
+              <span className="text-[12px] font-medium text-[var(--text-muted)] italic">
+                Unavailable
+              </span>
+            ) : currentVariantQty > 0 ? (
+              <Stepper
+                value={currentVariantQty}
+                onChange={(newQty) => {
+                  if (activeVariant) {
+                    onUpdateQuantity(activeVariant.id, newQty);
+                  }
+                }}
+              />
+            ) : (
+              /* Wide low beige '+' bar as add action */
+              <button
+                type="button"
+                onClick={() => {
+                  if (activeVariant) {
+                    onAddToCart(activeVariant, 1);
+                  }
+                }}
+                className="touch-target inline-flex items-center justify-center gap-1.5 px-4 h-11 rounded-full bg-[var(--surface-2)] text-[var(--text)] border border-[var(--border)] hover:bg-[var(--accent)]/20 hover:border-[var(--accent)]/40 active:scale-95 transition-all text-[14px] font-semibold shadow-2xs"
+                aria-label={`Add ${item.name} to order`}
+              >
+                <Plus className="w-4 h-4 text-[var(--accent-ink)]" />
+                <span>Add</span>
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </article>
   );
 };
+
 
