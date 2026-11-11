@@ -106,6 +106,7 @@ describe('Phase 3 Owner Dashboard & Alert System Suite', () => {
     const createRes = await app.inject({
       method: 'POST',
       url: '/api/orders',
+      remoteAddress: '10.5.5.5',
       payload: {
         table_label: 'T5',
         customer_name: 'Owner Summary Test',
@@ -149,3 +150,4 @@ describe('Phase 3 Owner Dashboard & Alert System Suite', () => {
     expect(paidSummary.unpaid_sales_paise).toBe(initialUnpaid);
   });
 });
+

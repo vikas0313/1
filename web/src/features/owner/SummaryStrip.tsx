@@ -107,3 +107,4 @@ export const SummaryStrip: React.FC = () => {
     </div>
   );
 };
+

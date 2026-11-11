@@ -19,7 +19,7 @@ export function createRateLimiter(options: { max: number; windowMs: number; mess
   }, 60000);
 
   return async (req: FastifyRequest, reply: FastifyReply): Promise<void> => {
-    const ip = req.ip || req.socket.remoteAddress || 'unknown';
+    const ip = (req.headers['x-forwarded-for'] as string) || req.ip || req.socket.remoteAddress || 'unknown';
     const now = Date.now();
     let record = store.get(ip);
 

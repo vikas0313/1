@@ -1,0 +1,30 @@
+app = "ritsu-food-corner"
+primary_region = "sin"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  PORT = "3001"
+  NODE_ENV = "production"
+  DATABASE_PATH = "/data/ritsu.db"
+  DEMO_MODE = "false"
+
+[mounts]
+  source = "ritsu_data"
+  destination = "/data"
+
+[http_service]
+  internal_port = 3001
+  force_https = true
+  auto_stop_machines = false
+  auto_start_machines = true
+  min_machines_running = 1
+
+[[http_service.checks]]
+  interval = "30s"
+  timeout = "5s"
+  grace_period = "10s"
+  method = "GET"
+  path = "/health"
+

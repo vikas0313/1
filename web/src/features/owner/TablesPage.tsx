@@ -330,3 +330,4 @@ const PrintableQrCard: React.FC<{ table: Table; baseUrl: string }> = ({ table, b
     </div>
   );
 };
+

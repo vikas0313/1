@@ -119,3 +119,4 @@ export const OwnerLoginPage: React.FC<OwnerLoginPageProps> = ({ onLoginSuccess }
     </div>
   );
 };
+

@@ -602,3 +602,4 @@ export const MenuManagerPage: React.FC = () => {
     </div>
   );
 };
+

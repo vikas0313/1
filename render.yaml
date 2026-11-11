@@ -1,0 +1,28 @@
+services:
+  - type: web
+    name: ritsu-food-corner
+    runtime: docker
+    plan: starter
+    region: oregon
+    dockerfilePath: Dockerfile
+    healthCheckPath: /health
+    disk:
+      name: ritsu-sqlite-data
+      mountPath: /data
+      sizeGB: 1
+    envVars:
+      - key: PORT
+        value: 3001
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_PATH
+        value: /data/ritsu.db
+      - key: BASE_URL
+        sync: false # Set to your https://*.onrender.com domain
+      - key: OWNER_PASSWORD_HASH
+        sync: false # Generate with: npm run hash-password -- "YourPassword"
+      - key: DEMO_MODE
+        value: "false"
+      - key: SESSION_SECRET
+        generateValue: true
+

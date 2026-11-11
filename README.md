@@ -1,118 +1,144 @@
-# Ritsu Food Corner — QR Ordering System
+# 🍜 Ritsu Food Corner — QR Dine-In Ordering System
 
-> "Indo-Chinese ka asli maza – Ritsu ke saath!"
+A complete **table-to-kitchen real-time ordering system** for an Indo-Chinese restaurant. Customers scan a table QR code on their phone, browse the full 165-item menu, place orders with GST-accurate billing, and track live status. The owner dashboard speaks *"New order. Table 3."* the instant an order arrives.
 
-Production-grade, mobile-first QR ordering web application tailored for Indian restaurants with single/full portion pricing, 5% GST computation (CGST 2.5% + SGST 2.5%), multi-device live sync via Supabase, and role-based owner management.
-
----
-
-## Architecture & Data Backends
-
-The application features a clean repository-pattern data layer with zero UI coupling:
-- **`LocalStorageAdapter`**: Runs offline or in prototype demo mode with zero cloud setup. BroadcastChannel & storage events provide instant cross-tab sync.
-- **`SupabaseAdapter`**: Multi-device production backend with PostgreSQL, Row Level Security (RLS), Edge Functions, and Realtime event subscriptions.
-
-Switch data backend at any time via `.env`:
-```bash
-VITE_DATA_BACKEND=local    # Prototype / local demo
-VITE_DATA_BACKEND=supabase # Production Supabase backend
-```
+Built with **Fastify 5 + SQLite (node:sqlite) + React 19 + Vite + Tailwind CSS 4**. Zero external databases. Zero native dependencies. Single `npm install` on any OS.
 
 ---
 
-## Phase 2 Setup Guide (Supabase Backend)
+## Quick Start (Local Development)
 
-### 1. Prerequisites
-- [Supabase](https://supabase.com) account & project (or local Supabase via Docker).
-- Node.js 20+ installed.
-
-### 2. Configure Environment Variables
-Copy `.env.example` to `.env`:
 ```bash
-VITE_DATA_BACKEND=supabase
-VITE_SUPABASE_URL=https://your-project-ref.supabase.co
-VITE_SUPABASE_ANON_KEY=eyJhbGciOi...
-VITE_BASE_URL=https://your-domain.com
-```
+# 1. Clone the repo
+git clone https://github.com/vikas0313/1.git ritsu-food-corner
+cd ritsu-food-corner
 
-### 3. Run Database Migrations
-Migrations are located in `supabase/migrations/`:
-- `20261013000001_create_tables.sql`: 9 relational tables + owners table with integer paise and timestamptz.
-- `20261013000002_functions_and_triggers.sql`: State machine one-way transition enforcement trigger, payment validation trigger, updated_at timestamps.
-- `20261013000003_rls_policies.sql`: Deny-all RLS policies with granular owner permissions.
-- `20261013000004_realtime_and_rpc.sql`: Realtime publications and secure RPCs (`get_order_by_token`, `get_sales_summary`).
+# 2. Copy environment template
+cp .env.example .env
 
-Execute them using Supabase CLI:
-```bash
-npx supabase db reset
-# OR apply to remote project
-npx supabase db push
-```
+# 3. Install all workspace dependencies
+npm install
 
-### 4. Seed Menu Data
-The menu seed contains 165 dishes across 14 categories with all portion variants and table slots T1–T8:
-```bash
-npx supabase db execute --file supabase/seed.sql
-```
-
-### 5. Onboard the First Restaurant Owner
-Public registrations are strictly disabled. To create the first owner:
-1. Create a user via Supabase Dashboard under **Authentication > Users** (or via `supabase auth admin create-user`).
-2. Add that user's UUID to the `owners` table in the SQL Editor:
-```sql
-INSERT INTO owners (user_id) VALUES ('<user-uuid-from-auth>');
-```
-Now log in via the Owner Portal at `/owner`.
-
-### 6. Deploy Edge Functions
-Deploy the serverless Edge Functions for secure price recalculation, token generation, and rate limiting:
-```bash
-npx supabase functions deploy create-order --no-verify-jwt
-npx supabase functions deploy get-order --no-verify-jwt
-```
-Set the necessary secrets:
-```bash
-npx supabase secrets set SUPABASE_SERVICE_ROLE_KEY=eyJhbGci...
-npx supabase secrets set SITE_URL=https://your-domain.com
-npx supabase secrets set RATE_LIMIT_MAX=5
-npx supabase secrets set RATE_LIMIT_WINDOW_SEC=600
-```
-
----
-
-## Rollback Note (Return to Local Mode)
-
-To quickly revert to the local-storage prototype without Supabase:
-1. In `.env`, change:
-```bash
-VITE_DATA_BACKEND=local
-VITE_DEMO_OWNER_PASSWORD=admin123
-```
-2. Restart the Vite dev server:
-```bash
+# 4. Start development server (API + Vite HMR)
 npm run dev
 ```
 
----
-
-## Restaurant Configuration & Placeholders
-
-All restaurant identity details are centralized in `src/config/restaurant.config.ts`:
-- **GSTIN**: `36AAAAA0000A1Z5` *(Placeholder)*
-- **FSSAI License**: `13621000000000` *(Placeholder)*
-- **Contact Phone**: `+91 98765 43210` *(Placeholder)*
-- **Address**: Main Road, Opp. City Center, Hyderabad - 500032 *(Placeholder)*
-- **UPI VPA**: `ritsufoodcorner@okaxis` *(Placeholder)*
-- **Tables**: T1 through T8
+Open:
+- **Customer:** `http://localhost:5173/?table=T1`
+- **Owner Dashboard:** `http://localhost:5173/owner` (password: `admin123` in demo mode)
 
 ---
 
-## Running Automated Tests
+## Project Structure
+
+```
+ritsu-food-corner/
+├── shared/          @ritsu/shared — types, pricing math, state machine, menu seed
+│   └── src/
+├── server/          @ritsu/server — Fastify 5 API, SQLite, SSE, auth, migrations
+│   ├── migrations/  SQL schema + seed data (auto-run on boot)
+│   ├── src/
+│   └── tests/       Vitest unit + integration tests
+├── web/             @ritsu/web — React 19 SPA (customer + owner)
+│   └── src/
+│       ├── components/    Design system (Button, Badge, Stepper, Toast, etc.)
+│       ├── features/
+│       │   ├── customer/  Welcome → Menu → Cart → Payment → Tracking → Bill
+│       │   └── owner/     Login → Kanban → Menu Manager → Tables & QR → Sales → Settings
+│       ├── services/      AlertService (Web Audio + SpeechSynthesis)
+│       └── styles/        Heritage Gold tokens, global CSS, print rules
+├── docs/            Deployment guides (Render, Fly.io, Cloudflare Tunnel)
+├── Dockerfile       Multi-stage production build
+├── render.yaml      Render.com blueprint
+├── fly.toml         Fly.io configuration
+└── .env.example     Environment variables template
+```
+
+---
+
+## Environment Variables
+
+| Variable | Default | Description |
+|---|---|---|
+| `PORT` | `3001` | Fastify listening port |
+| `HOST` | `0.0.0.0` | Bind address |
+| `NODE_ENV` | `development` | `production` disables verbose logging |
+| `DATABASE_PATH` | `./data/ritsu.db` | SQLite file path (persistent volume in prod) |
+| `SESSION_SECRET` | — | Random string for signed session cookies |
+| `OWNER_PASSWORD_HASH` | — | bcrypt hash (generate with `npm run hash-password`) |
+| `DEMO_MODE` | `true` | When `true`, accepts `admin123` as owner password |
+| `BASE_URL` | `http://localhost:3001` | Public HTTPS URL encoded into QR codes |
+
+---
+
+## Generating an Owner Password Hash
 
 ```bash
-# Run Vitest test suite (pricing parity, schema, edge functions, adapters, security)
-npm test
-
-# Run build verification
-npm run build
+npm run hash-password -- "YourSecretPassword"
 ```
+
+Copy the output `$2a$10$...` string into `OWNER_PASSWORD_HASH` in your `.env` or hosting environment.
+
+---
+
+## Running Tests
+
+```bash
+npm test
+```
+
+Runs the full Vitest suite across `@ritsu/shared` (20 tests) and `@ritsu/server` (12 tests):
+- GST pricing math (CGST 2.5% + SGST 2.5%)
+- Order state machine transitions and illegal transition guards
+- Cart add/remove/update with size validation
+- API idempotency (duplicate `client_request_id`)
+- Auth guard (401 on unauthenticated owner access)
+- Rate limiting (429 after 10 failed logins)
+- Price tamper protection (server always recomputes)
+- AlertService queue processing and deduplication
+- Sales summary totals after Mark Paid
+
+---
+
+## Seeded Menu
+
+The database auto-seeds **165 items across 14 categories** on first boot (Soups, Starters, Momos, Noodles, Fried Rice, Manchurian, Paneer, Chicken, Rice & Biryani, Rolls, Add-Ons, Desserts, Beverages, Soft Drinks). Some prices are marked `needs_verification` — confirm them in the Menu Manager before going live.
+
+---
+
+## Deployment
+
+| Platform | Guide | Cost |
+|---|---|---|
+| **Render.com** | [`docs/deploy-render.md`](docs/deploy-render.md) | From \$7/mo (persistent disk) |
+| **Fly.io** | [`docs/deploy-fly.md`](docs/deploy-fly.md) | Free tier possible |
+| **Cloudflare Tunnel** | [`docs/deploy-cloudflare-tunnel.md`](docs/deploy-cloudflare-tunnel.md) | Free (runs on your own PC) |
+
+---
+
+## Go-Live Checklist
+
+See [`docs/go-live-checklist.md`](docs/go-live-checklist.md) for the complete pre-launch verification list.
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Runtime | Node.js 22/24 with `node:sqlite` (built-in `DatabaseSync`) |
+| API | Fastify 5, Helmet, CORS, signed cookies, rate limiting |
+| Auth | bcryptjs (pure JS), signed httpOnly session cookies |
+| Database | SQLite with WAL mode, foreign keys, auto-migrations |
+| Real-time | Server-Sent Events with 5s polling fallback |
+| Frontend | React 19, Vite 6, Tailwind CSS 4 |
+| Audio | Web Audio API (AudioContext) + SpeechSynthesis + Wake Lock |
+| QR | `qrcode` library (canvas rendering) |
+| Tests | Vitest |
+| Container | Docker multi-stage (node:22-alpine) |
+
+---
+
+## License
+
+Private project. All rights reserved.

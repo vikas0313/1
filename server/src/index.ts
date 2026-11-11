@@ -6,6 +6,7 @@ import { config } from './config.js';
 import { getDb, closeDb } from './db.js';
 import { publicRoutes } from './routes/public.js';
 import { ownerRoutes } from './routes/owner.js';
+import { backupService } from './services/backupService.js';
 
 export async function createServer() {
   const app = fastify({
