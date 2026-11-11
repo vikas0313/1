@@ -260,31 +260,31 @@ export const OrderCard: React.FC<OrderCardProps> = ({
             </p>
 
             <div className="space-y-2 mb-4">
-              <label className="text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)] block">
+              <label className="text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)] block">
                 Payment Method
               </label>
               <div className="grid grid-cols-2 gap-2">
                 <button
                   type="button"
                   onClick={() => setPaidMethod('cash')}
-                  className={`py-2 text-xs font-bold uppercase rounded border transition-colors ${
+                  className={`py-2 text-xs font-bold uppercase rounded-xl border transition-colors ${
                     paidMethod === 'cash'
-                      ? 'border-[var(--gold-ink)] bg-[var(--gold-ink)]/15 text-[var(--gold-ink)]'
-                      : 'border-[var(--border-default)] text-[var(--text-secondary)]'
+                      ? 'border-[var(--accent)] bg-[var(--accent)]/15 text-[var(--accent-ink)]'
+                      : 'border-[var(--border)] text-[var(--text-muted)]'
                   }`}
                 >
-                  Cash
+                  Cash at Counter
                 </button>
                 <button
                   type="button"
                   onClick={() => setPaidMethod('upi_manual')}
-                  className={`py-2 text-xs font-bold uppercase rounded border transition-colors ${
+                  className={`py-2 text-xs font-bold uppercase rounded-xl border transition-colors ${
                     paidMethod === 'upi_manual'
-                      ? 'border-[var(--gold-ink)] bg-[var(--gold-ink)]/15 text-[var(--gold-ink)]'
-                      : 'border-[var(--border-default)] text-[var(--text-secondary)]'
+                      ? 'border-[var(--accent)] bg-[var(--accent)]/15 text-[var(--accent-ink)]'
+                      : 'border-[var(--border)] text-[var(--text-muted)]'
                   }`}
                 >
-                  UPI Verified
+                  Other / UPI
                 </button>
               </div>
             </div>
