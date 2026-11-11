@@ -62,7 +62,7 @@ export async function createServer() {
   await app.register(ownerRoutes, { prefix: '/api/owner' });
 
   // Global error handler
-  app.setErrorHandler((error, req, reply) => {
+  app.setErrorHandler((error: any, req, reply) => {
     if (error.validation) {
       return reply.status(400).send({
         error: 'Validation error',
