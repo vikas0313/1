@@ -58,6 +58,38 @@ export const SalesPage: React.FC = () => {
 
         const sorted = Array.from(map.values()).sort((a, b) => b.date.localeCompare(a.date));
         setDailyData(sorted);
+      } else {
+        // Fallback: local orders
+        const localOrders: any[] = JSON.parse(localStorage.getItem('ritsu_local_orders') || '[]');
+        const map = new Map<string, DailySummary>();
+        let totalSales = 0;
+
+        localOrders.forEach((o) => {
+          const d = (o.created_at || '').slice(0, 10) || new Date().toISOString().slice(0, 10);
+          if (!map.has(d)) {
+            map.set(d, {
+              date: d,
+              paidOrders: 0,
+              paidRevenuePaise: 0,
+              unpaidOrders: 0,
+              unpaidRevenuePaise: 0,
+            });
+          }
+          const entry = map.get(d)!;
+          if (o.payment_status === 'paid') {
+            entry.paidOrders += 1;
+            entry.paidRevenuePaise += o.total_paise || 0;
+            totalSales += o.total_paise || 0;
+          } else {
+            entry.unpaidOrders += 1;
+            entry.unpaidRevenuePaise += o.total_paise || 0;
+          }
+        });
+
+        const sorted = Array.from(map.values()).sort((a, b) => b.date.localeCompare(a.date));
+        setDailyData(sorted);
+        setTotalOrders(localOrders.length);
+        setTotalSalesPaise(totalSales);
       }
     } catch {
       // ignore

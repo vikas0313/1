@@ -149,5 +149,33 @@ describe('Phase 3 Owner Dashboard & Alert System Suite', () => {
     expect(paidSummary.total_sales_paise).toBe(initialSales + orderTotal);
     expect(paidSummary.unpaid_sales_paise).toBe(initialUnpaid);
   });
+
+  // P3-27: Staff & Owner Password verification
+  it('P3-27: supports admin123 and staff123, trims whitespace, and rejects invalid passwords', async () => {
+    // 1. admin123 with whitespace
+    const res1 = await app.inject({
+      method: 'POST',
+      url: '/api/owner/login',
+      payload: { password: '  admin123  ' },
+    });
+    expect(res1.statusCode).toBe(200);
+    expect(res1.headers['set-cookie']).toBeDefined();
+
+    // 2. staff123
+    const res2 = await app.inject({
+      method: 'POST',
+      url: '/api/owner/login',
+      payload: { password: 'staff123' },
+    });
+    expect(res2.statusCode).toBe(200);
+
+    // 3. Invalid password
+    const res3 = await app.inject({
+      method: 'POST',
+      url: '/api/owner/login',
+      payload: { password: 'completely-wrong-password' },
+    });
+    expect(res3.statusCode).toBe(401);
+  });
 });
 

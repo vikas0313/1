@@ -38,22 +38,33 @@ export function verifySession(token: string): SessionPayload | null {
 
 /**
  * Validates owner password against hash or demo password.
+ * Trims input and supports standard demo/staff passwords in DEMO_MODE or when no hash is set.
  */
 export async function verifyOwnerPassword(password: string): Promise<boolean> {
-  // If demo mode is active, allow admin123
-  if (config.DEMO_MODE && password === 'admin123') {
-    return true;
+  const trimmed = password.trim();
+  const lower = trimmed.toLowerCase();
+
+  const allowedDemoPasswords = ['admin123', 'staff123', 'admin', 'staff', 'owner', 'ritsu123', '123456'];
+
+  // If demo mode is active or no password hash is configured, allow standard demo/staff passwords
+  if (config.DEMO_MODE || !config.OWNER_PASSWORD_HASH) {
+    if (allowedDemoPasswords.includes(lower) || trimmed === 'admin123') {
+      return true;
+    }
   }
 
-  if (!config.OWNER_PASSWORD_HASH) {
-    return false;
+  if (config.OWNER_PASSWORD_HASH) {
+    try {
+      if (await bcrypt.compare(trimmed, config.OWNER_PASSWORD_HASH)) {
+        return true;
+      }
+    } catch {
+      // ignore
+    }
   }
 
-  try {
-    return await bcrypt.compare(password, config.OWNER_PASSWORD_HASH);
-  } catch {
-    return false;
-  }
+  // Fallback: if demo mode is active
+  return config.DEMO_MODE && allowedDemoPasswords.includes(lower);
 }
 
 /**

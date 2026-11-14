@@ -39,12 +39,13 @@ export const OwnerLayout: React.FC<OwnerLayoutProps> = ({
   const pendingOrdersCount = propPendingOrdersCount ?? context?.pendingOrdersCount ?? 0;
 
   const handleLogout = async () => {
+    sessionStorage.removeItem('ritsu_owner_authenticated');
     try {
       await fetch('/api/owner/logout', { method: 'POST' });
-      window.location.reload();
     } catch {
-      window.location.reload();
+      // ignore
     }
+    window.location.reload();
   };
 
   const navItems: { id: OwnerTab; label: string; icon: React.FC<{ className?: string }> }[] = [

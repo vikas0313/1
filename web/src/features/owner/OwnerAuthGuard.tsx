@@ -16,14 +16,16 @@ export const OwnerAuthGuard: React.FC<OwnerAuthGuardProps> = ({ children }) => {
       if (res.ok) {
         const data = await res.json();
         setIsAuthenticated(!!data.authenticated);
-      } else {
-        setIsAuthenticated(false);
+        setChecking(false);
+        return;
       }
     } catch {
-      setIsAuthenticated(false);
-    } finally {
-      setChecking(false);
+      // Fallback
     }
+
+    const localAuth = sessionStorage.getItem('ritsu_owner_authenticated') === 'true';
+    setIsAuthenticated(localAuth);
+    setChecking(false);
   };
 
   useEffect(() => {

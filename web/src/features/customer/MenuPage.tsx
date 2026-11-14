@@ -17,12 +17,14 @@ export interface MenuPageProps {
   tableLabel: string;
   customerName: string;
   onOrderPlaced: (order: Order) => void;
+  onChangeTable?: () => void;
 }
 
 export const MenuPage: React.FC<MenuPageProps> = ({
   tableLabel,
   customerName,
   onOrderPlaced,
+  onChangeTable,
 }) => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [items, setItems] = useState<MenuItem[]>([]);
@@ -184,6 +186,8 @@ export const MenuPage: React.FC<MenuPageProps> = ({
         title="Ritsu Food Corner"
         subtitle={`Table ${tableLabel} · ${customerName}`}
         tableLabel={tableLabel}
+        showBack={Boolean(onChangeTable)}
+        onBack={onChangeTable}
       />
 
       <div className="max-w-7xl mx-auto px-4 pt-3 pb-6">

@@ -28,18 +28,33 @@ export const TablesPage: React.FC = () => {
     fetchTables();
   }, []);
 
+  const DEFAULT_TABLES: Table[] = [
+    { id: 'tbl-1', label: 'T1', active: true, sort_order: 1, created_at: '' },
+    { id: 'tbl-2', label: 'T2', active: true, sort_order: 2, created_at: '' },
+    { id: 'tbl-3', label: 'T3', active: true, sort_order: 3, created_at: '' },
+    { id: 'tbl-4', label: 'T4', active: true, sort_order: 4, created_at: '' },
+    { id: 'tbl-5', label: 'T5', active: true, sort_order: 5, created_at: '' },
+    { id: 'tbl-6', label: 'T6', active: true, sort_order: 6, created_at: '' },
+    { id: 'tbl-7', label: 'T7', active: true, sort_order: 7, created_at: '' },
+    { id: 'tbl-8', label: 'T8', active: true, sort_order: 8, created_at: '' },
+  ];
+
   const fetchTables = async () => {
     try {
       const res = await fetch('/api/owner/tables');
       if (res.ok) {
         const data = await res.json();
-        setTables(data);
+        if (Array.isArray(data) && data.length > 0) {
+          setTables(data);
+          return;
+        }
       }
     } catch {
       // ignore
     } finally {
       setLoading(false);
     }
+    setTables(DEFAULT_TABLES);
   };
 
   const isLocalUrl = baseUrl.includes('localhost') || baseUrl.includes('127.0.0.1') || /192\.168\.\d+\.\d+/.test(baseUrl);

@@ -47,10 +47,10 @@ export const orderRateLimiter = createRateLimiter({
   message: 'Too many orders placed from this network. Please wait a few minutes before trying again.',
 });
 
-// 10 login attempts per hour per IP
+// 10 login attempts per 15 minutes per IP
 export const loginRateLimiter = createRateLimiter({
   max: 10,
-  windowMs: 60 * 60 * 1000,
-  message: 'Too many login attempts. Please wait an hour before trying again.',
+  windowMs: 15 * 60 * 1000,
+  message: 'Too many login attempts. Please wait 15 minutes before trying again.',
 });
 

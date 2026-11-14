@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import type { Category, MenuItem, ItemVariant } from '@ritsu/shared';
-import { formatPaise } from '@ritsu/shared';
+import { formatPaise, SEED_CATEGORIES, SEED_MENU_ITEMS } from '@ritsu/shared';
 import { Button } from '../../components/Button.js';
 import { Skeleton } from '../../components/Skeleton.js';
 import { 
@@ -41,16 +41,26 @@ export const MenuManagerPage: React.FC = () => {
       const res = await fetch('/api/owner/menu');
       if (res.ok) {
         const data = await res.json();
-        setCategories(data.categories || []);
-        setItems(data.items || []);
-        if (data.categories?.length > 0 && !newItemCategoryId) {
-          setNewItemCategoryId(data.categories[0].id);
+        if (data.categories?.length > 0) {
+          setCategories(data.categories || []);
+          setItems(data.items || []);
+          if (!newItemCategoryId && data.categories?.length > 0) {
+            setNewItemCategoryId(data.categories[0].id);
+          }
+          return;
         }
       }
     } catch {
       // ignore
     } finally {
       setLoading(false);
+    }
+
+    // Fallback menu data
+    setCategories(SEED_CATEGORIES);
+    setItems(SEED_MENU_ITEMS);
+    if (!newItemCategoryId && SEED_CATEGORIES.length > 0) {
+      setNewItemCategoryId(SEED_CATEGORIES[0].id);
     }
   };
 

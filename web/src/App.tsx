@@ -111,6 +111,7 @@ export const App: React.FC = () => {
           tableLabel={tableLabel}
           customerName={customerName}
           onOrderPlaced={handleOrderPlaced}
+          onChangeTable={() => setScreen('welcome')}
         />
       )}
 

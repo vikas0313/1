@@ -46,11 +46,32 @@ export const OwnerOrdersProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
         data.forEach((o) => knownOrderIdsRef.current.add(o.id));
         isInitialLoadRef.current = false;
+        return;
       }
     } catch {
       // ignore
     } finally {
       setLoading(false);
+    }
+
+    // Fallback: load local orders when backend is unreachable or on static hosting
+    try {
+      const localOrders: Order[] = JSON.parse(localStorage.getItem('ritsu_local_orders') || '[]');
+      setOrders(localOrders);
+      if (!isInitialLoadRef.current) {
+        for (const order of localOrders) {
+          if (order.status === 'pending' && !knownOrderIdsRef.current.has(order.id)) {
+            alertService.enqueue({
+              id: order.id,
+              table_label: order.table_label,
+            });
+          }
+        }
+      }
+      localOrders.forEach((o) => knownOrderIdsRef.current.add(o.id));
+      isInitialLoadRef.current = false;
+    } catch {
+      // ignore
     }
   }, []);
 
