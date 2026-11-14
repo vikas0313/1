@@ -81,8 +81,7 @@ export const BillPage: React.FC<BillPageProps> = ({
               {settings?.address || 'Main Road, Food Street, India'}
             </p>
             <p className="text-[12px] text-[var(--text-muted)] mt-0.5 print:text-gray-600">
-              GSTIN: <span className="font-mono">{settings?.gstin || '36ABCDE1234F1Z5'}</span> · Tel:{' '}
-              {settings?.phone || '+91 98765 43210'}
+              GSTIN: <span className="font-mono">{settings?.gstin || '36ABCDE1234F1Z5'}</span>
             </p>
           </div>
 

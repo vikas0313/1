@@ -3,7 +3,7 @@ import { apiAdapter } from '../../data/ApiAdapter.js';
 import { Button } from '../../components/Button.js';
 import { ThemeToggle } from '../../components/ThemeToggle.js';
 import { InvalidTablePage } from './InvalidTablePage.js';
-import { Phone, UtensilsCrossed, Edit2, Check } from 'lucide-react';
+import { UtensilsCrossed, Edit2 } from 'lucide-react';
 
 export interface WelcomePageProps {
   onStartOrdering: (tableLabel: string, customerName: string) => void;
@@ -18,7 +18,6 @@ export const WelcomePage: React.FC<WelcomePageProps> = ({ onStartOrdering }) => 
   const [isValidatingTable, setIsValidatingTable] = useState<boolean>(true);
   const [isTableValid, setIsTableValid] = useState<boolean>(true);
   const [nameError, setNameError] = useState<string>('');
-  const [phone, setPhone] = useState<string>('+91 98765 43210');
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -49,11 +48,6 @@ export const WelcomePage: React.FC<WelcomePageProps> = ({ onStartOrdering }) => 
           setIsValidatingTable(false);
         });
     }
-
-    apiAdapter
-      .getRestaurantSettings()
-      .then((s) => setPhone(s.phone))
-      .catch(() => {});
   }, []);
 
   const handleSelectTable = (label: string) => {
@@ -205,19 +199,6 @@ export const WelcomePage: React.FC<WelcomePageProps> = ({ onStartOrdering }) => 
             </Button>
           </form>
         </main>
-
-        <footer className="text-center pt-5 mt-5 border-t border-[var(--border)]">
-          <p className="text-[12px] text-[var(--text-muted)] mb-1">
-            Hosting a party or bulk event?
-          </p>
-          <a
-            href={`tel:${phone.replace(/[^0-9+]/g, '')}`}
-            className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-[var(--accent-ink)] hover:underline"
-          >
-            <Phone className="w-3.5 h-3.5" />
-            <span>Call us: {phone}</span>
-          </a>
-        </footer>
       </div>
     </div>
   );

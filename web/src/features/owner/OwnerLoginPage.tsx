@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '../../components/Button.js';
 import { alertService } from '../../services/AlertService.js';
-import { Lock, ShieldCheck, KeyRound } from 'lucide-react';
+import { Lock, ShieldCheck } from 'lucide-react';
 
 interface OwnerLoginPageProps {
   onLoginSuccess: () => void;
@@ -70,7 +70,7 @@ export const OwnerLoginPage: React.FC<OwnerLoginPageProps> = ({ onLoginSuccess }
         }
       }
 
-      setError('Incorrect password. Please use admin123 or staff123.');
+      setError('Incorrect password. Access denied.');
       setLoading(false);
     } catch {
       // Fallback on network/Vercel static hosting
@@ -80,7 +80,7 @@ export const OwnerLoginPage: React.FC<OwnerLoginPageProps> = ({ onLoginSuccess }
         onLoginSuccess();
         return;
       }
-      setError('Incorrect password. Please use admin123 or staff123.');
+      setError('Incorrect password. Access denied.');
       setLoading(false);
     }
   };
@@ -100,35 +100,6 @@ export const OwnerLoginPage: React.FC<OwnerLoginPageProps> = ({ onLoginSuccess }
           </p>
         </div>
 
-        {/* Clear Credentials Guidance Card */}
-        <div className="mb-5 p-3.5 rounded-2xl bg-[var(--surface-2)] border border-[var(--border)] text-left">
-          <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-[var(--accent-ink)] mb-2">
-            <KeyRound className="w-3.5 h-3.5" />
-            <span>Default Portal Passwords</span>
-          </div>
-          <div className="flex flex-wrap items-center gap-1.5 text-[12px]">
-            <button
-              type="button"
-              onClick={() => setPassword('admin123')}
-              className="px-2.5 py-1 rounded-lg bg-[var(--surface)] border border-[var(--border)] font-mono font-semibold text-[var(--text)] hover:border-[var(--accent)] transition-all cursor-pointer text-xs"
-              title="Click to fill admin123"
-            >
-              admin123
-            </button>
-            <button
-              type="button"
-              onClick={() => setPassword('staff123')}
-              className="px-2.5 py-1 rounded-lg bg-[var(--surface)] border border-[var(--border)] font-mono font-semibold text-[var(--text)] hover:border-[var(--accent)] transition-all cursor-pointer text-xs"
-              title="Click to fill staff123"
-            >
-              staff123
-            </button>
-          </div>
-          <p className="text-[11px] text-[var(--text-muted)] mt-2 leading-tight">
-            Tap a password above or type it below to sign in.
-          </p>
-        </div>
-
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-[13px] font-semibold text-[var(--text)] mb-2">
@@ -141,7 +112,7 @@ export const OwnerLoginPage: React.FC<OwnerLoginPageProps> = ({ onLoginSuccess }
                 setPassword(e.target.value);
                 if (error) setError(null);
               }}
-              placeholder="Enter admin123 or staff123"
+              placeholder="Enter password"
               autoComplete="off"
               autoFocus
               className="touch-target w-full px-4 h-12 text-[14px] bg-[var(--surface-2)] border border-[var(--border)] rounded-full text-[var(--text)] focus:outline-none focus:border-[var(--accent)] focus:bg-[var(--surface)] transition-all"
